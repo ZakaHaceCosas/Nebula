@@ -1,10 +1,11 @@
-import { Client, ActivityType } from "discord.js";
-import Commands from "./handlers/commands.js";
-import Events from "./handlers/events.js";
+import { ActivityType, Client } from "discord.js";
+import { Commands } from "./handlers/commands";
+import { Events } from "./handlers/events";
+import { rescheduleUnbans } from "./utils/unbanScheduler";
 
 const client = new Client({
   presence: {
-    activities: [{ name: "with /settings!", type: ActivityType.Playing }]
+    activities: [{ name: "your feedback!", type: ActivityType.Listening }]
   },
   intents: [
     "Guilds",
@@ -12,15 +13,16 @@ const client = new Client({
     "GuildMessages",
     "GuildEmojisAndStickers",
     "GuildPresences",
+    "GuildBans",
     "MessageContent"
   ]
 });
 
 client.on("ready", async () => {
-  new Events(client);
-  console.log("Starting all commands.");
+  await new Events(client).loadEvents();
   await new Commands(client).registerCommands();
   console.log("ちーっす！");
+  rescheduleUnbans(client);
 });
 
 client.login(process.env.TOKEN);

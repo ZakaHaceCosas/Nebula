@@ -1,26 +1,26 @@
 import type { Client } from "discord.js";
-import { pathToFileURL } from "url";
-import { join } from "path";
 import { readdirSync } from "fs";
+import { join } from "path";
+import { pathToFileURL } from "url";
 
-export default class Events {
+export class Events {
   client: Client;
   events: any[] = [];
-
   constructor(client: Client) {
     this.client = client;
+  }
 
-    (async () => {
-      const eventsPath = join(process.cwd(), "src", "events");
+  async loadEvents() {
+    const eventsPath = join(process.cwd(), "src", "events");
 
-      for (const eventFile of readdirSync(eventsPath)) {
-        if (!eventFile.endsWith("js")) continue;
+    for (const eventFile of readdirSync(eventsPath)) {
+      if (!eventFile.endsWith("ts")) continue;
 
-        const event = await import(pathToFileURL(join(eventsPath, eventFile)).toString());
-        const clientEvent = this.client.on(event.default.name, new event.default.event(this.client).run);
+      const event = (await import(pathToFileURL(join(eventsPath, eventFile)).toString())).default;
+      const eventName = eventFile.split(".ts")[0];
+      const clientEvent = this.client.on(eventName, event);
 
-        this.events.push({ name: event.default.name, event: clientEvent });
-      }
-    })();
+      this.events.push({ name: eventName, event: clientEvent });
+    }
   }
 }

@@ -1,12 +1,12 @@
-# Nebula Contributing Guide
+# Sokora Contributing Guide
 
 ## Prerequisites
 - Basic knowledge of [TypeScript](https://typescriptlang.org/) and [discord.js](https://discord.js.org/).
-- [Bun](https://bun.sh) and [MySQL](https://mysql.com/) installed.
+- [Bun](https://bun.sh) installed.
 
-## Get started with developing
+## Get started with contributing
 ### Getting the code
-- Make a fork of this repository. 
+- Make a fork of this repository.
 - Clone your fork.
 
 ### Creating your bot
@@ -14,18 +14,11 @@
 - Invite your bot to your server.
 - Reset and then copy your bot's token.
 
-### Setting up your database
-We use MySQL for the database. You need to set one up to be able to run the bot.
-
-- Create a database file called `json.db`
-- It is recommended to create a specific user for Nebula only. See [the docs](https://dev.mysql.com/doc/refman/8.0/en/creating-accounts.html) for more information
-
 ### Setting up .env
-- Copy the `example.env` file and replace the content with your own credentials inside a file called `.env`.
+- Run `bun run setup` and our cli tool will install dependencies and write .env for you
 
 ### Running
-- Run `bun i` to install all the modules needed by the bot. 
-- Run `bun start`
+- Run `bun start`.
 
 Be sure to open a pull request when you're ready to push your changes. Be descriptive of the changes you've made.
 

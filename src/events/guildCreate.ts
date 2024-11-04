@@ -1,36 +1,34 @@
-import { EmbedBuilder, type Client, type Guild, DMChannel } from "discord.js";
-import Commands from "../handlers/commands.js";
-import randomise from "../utils/randomise.js";
-import { genColor } from "../utils/colorGen.js";
+import { EmbedBuilder, type DMChannel } from "discord.js";
+import { Commands } from "../handlers/commands";
+import { genColor } from "../utils/colorGen";
+import { randomise } from "../utils/randomise";
+import { Event } from "../utils/types";
 
-export default {
-  name: "guildCreate",
-  event: class GuildCreate {
-    client: Client;
+export default (async function run(guild) {
+  const dmChannel = (await (await guild.fetchOwner()).createDM().catch(() => null)) as
+    | DMChannel
+    | undefined;
 
-    constructor(client: Client) {
-      this.client = client;
-    }
+  let emojis = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
+  if (Math.round(Math.random() * 100) <= 5) emojis = ["⌨️", "💻", "🖥️"];
 
-    async run(guild: Guild) {
-      const owner = await guild.fetchOwner();
-      const dmChannel = (await owner.createDM().catch(() => null)) as DMChannel | null;;
-      const hearts = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
+  const client = guild.client;
+  const embed = new EmbedBuilder()
+    .setAuthor({
+      name: `Welcome to ${client.user.username}!`,
+      iconURL: client.user.displayAvatarURL()
+    })
+    .setDescription(
+      [
+        "Sokora is a multipurpose Discord bot that lets you manage your servers easily.",
+        "To manage the bot, use the **/settings** command.\n",
+        "Sokora is in an early stage of development. If you find bugs, please go to our [official server](https://discord.gg/c6C25P4BuY) and report them."
+      ].join("\n")
+    )
+    .setFooter({ text: `Made with ${randomise(emojis)} by the Sokora team` })
+    .setThumbnail(client.user.displayAvatarURL())
+    .setColor(genColor(200));
 
-      const embed = new EmbedBuilder()
-        .setTitle("👋 • Welcome to Nebula!")
-        .setDescription([
-          "Nebula is a multiplatform, multipurpose bot with the ability to add extensions to have additional features.",
-          "To do things like disabling/enabling commands, use the **/settings** command.",
-          "As of now, it's in an early stage of development. If you find bugs, please go to our [official server](https://discord.gg/7RdABJhQss) to report them."
-        ].join("\n\n"))
-        .setFooter({ text: `Made by the Nebula team with ${randomise(hearts)}` })
-        .setColor(genColor(200));
-
-      if (dmChannel) await dmChannel.send({ embeds: [embed] });
-
-      const commands = new Commands(guild.client);
-      await commands.registerCommandsForGuild(guild);
-    }
-  }
-}
+  await new Commands(client).registerCommandsForGuild(guild);
+  if (dmChannel) await dmChannel.send({ embeds: [embed] });
+} as Event<"guildCreate">);
