@@ -41,7 +41,7 @@ export const settingsDefinition: Record<
       },
       cooldown: {
         type: "INTEGER",
-        desc: "Set the cooldown between messages that add XP.",
+        desc: "Set the cooldown between messages that add XP (in seconds).",
         val: 2
       },
       difficulty: {

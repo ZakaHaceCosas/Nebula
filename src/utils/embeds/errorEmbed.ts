@@ -1,4 +1,4 @@
-import { EmbedBuilder, type ChatInputCommandInteraction, type ButtonInteraction } from "discord.js";
+import { EmbedBuilder, type ButtonInteraction, type ChatInputCommandInteraction } from "discord.js";
 import { genColor } from "../colorGen";
 
 /**
