@@ -4,6 +4,7 @@ import { join } from "path";
 import { pathToFileURL } from "url";
 import { capitalize } from "../utils/capitalize";
 import { Event } from "../utils/types";
+import { Commands } from "../handlers/commands";
 
 async function getCommand(
   interaction: CommandInteraction | AutocompleteInteraction,
@@ -31,6 +32,10 @@ async function getCommand(
 
 export default (async function run(interaction) {
   if (interaction.isChatInputCommand()) {
+    console.log(
+      new Commands(interaction.client).getCommand(interaction.commandName, interaction.options)
+    );
+    console.log(await getCommand(interaction, interaction.options));
     const command = await getCommand(interaction, interaction.options);
     if (!command) return;
     if (command.deferred) await interaction.deferReply();

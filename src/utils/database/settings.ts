@@ -156,6 +156,7 @@ export function getSetting<
   const set = settingsDefinition[key].settings[setting];
 
   if (!res.length) {
+    if (!set) return null;
     if (set.type == "LIST") return null;
     return set.val;
   }

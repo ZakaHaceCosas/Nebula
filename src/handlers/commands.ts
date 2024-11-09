@@ -7,11 +7,12 @@ import {
 import { readdirSync } from "fs";
 import { join } from "path";
 import { pathToFileURL } from "url";
+import { capitalize } from "../utils/capitalize";
 import { getDisabledCommands } from "../utils/database/disabledCommands";
 
+export let commands: SlashCommandBuilder[] = [];
 export class Commands {
   client: Client;
-  commands: any[] = [];
   constructor(client: Client) {
     this.client = client;
   }
@@ -81,7 +82,6 @@ export class Commands {
 
   async loadCommands(...disabledCommands: string[]) {
     const commandsPath = join(process.cwd(), "src", "commands");
-    this.commands = [];
     const commandFiles = readdirSync(commandsPath, { withFileTypes: true });
 
     for (const commandFile of commandFiles) {
@@ -90,7 +90,7 @@ export class Commands {
 
       if (commandFile.isFile()) {
         const commandImport = await import(pathToFileURL(join(commandsPath, name)).toString());
-        this.commands.push(new commandImport.default().data);
+        commands.push(new commandImport.default().data);
         continue;
       }
 
@@ -99,13 +99,15 @@ export class Commands {
         join(commandsPath, name),
         ...disabledCommands
       );
-      this.commands.push(subCommand);
+      commands.push(subCommand);
     }
+
+    return commands;
   }
 
   async registerCommandsForGuild(guild: Guild, ...disabledCommands: string[]) {
     await this.loadCommands(...disabledCommands);
-    await guild.commands.set(this.commands);
+    await guild.commands.set(commands);
   }
 
   async registerCommands(): Promise<any[]> {
@@ -115,9 +117,16 @@ export class Commands {
     for (const guildID of guilds.keys()) {
       const disabledCommands = getDisabledCommands(guildID);
       if (disabledCommands.length > 0) await this.loadCommands(...disabledCommands);
-      await guilds.get(guildID)?.commands.set(this.commands);
+      await guilds.get(guildID)?.commands.set(commands);
     }
 
-    return this.commands;
+    return commands;
+  }
+
+  async getCommand(name: string, options: any) {
+    const subcommandName = capitalize(options.getSubcommand(false));
+    const commandGroupName = capitalize(options.getSubcommandGroup(false));
+    console.log(commands.filter(command => command.name == name)[0]);
+    return commands.filter(command => command.name == name)[0];
   }
 }

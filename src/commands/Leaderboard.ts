@@ -105,7 +105,6 @@ export default class Leaderboard {
       });
     });
 
-    console.log("test");
     collector.on("end", async () => await interaction.editReply({ components: [] }));
   }
 }
