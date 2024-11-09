@@ -140,8 +140,10 @@ export class Commands {
 
   async getCommand(name: string, options: any) {
     const subcommandName = options.getSubcommand(false);
-    return subcommandName
-      ? subcommands.filter(subcommand => subcommand.data.name == subcommandName)[0]
-      : commands.filter(command => command.data.name == name)[0];
+
+    const command = commands.filter(command => command.data.name == name)[0];
+    const subcommand = subcommands.filter(subcommand => subcommand.data.name == subcommandName)[0];
+    if (!subcommand) return command;
+    return subcommand;
   }
 }
