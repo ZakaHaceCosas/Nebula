@@ -37,7 +37,7 @@ export default class About {
         {
           name: "📃 • General",
           value: [
-            "Version **0.1**, *Kaishi*",
+            "Version **0.1.1**, *Kaishi*",
             `**${members}** members • **${guilds.size}** guild${guilds.size == 1 ? "" : "s"} ${
               !shards ? "" : `• **${shards}** shard${shards == 1 ? "" : "s"}`
             }`

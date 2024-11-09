@@ -60,7 +60,12 @@ export default class View {
         .setStyle(ButtonStyle.Primary)
     );
 
-    const reply = await interaction.reply({ embeds: [getEmbed()], components: [row] });
+    const reply = await interaction.reply({
+      embeds: [getEmbed()],
+      components: page >= 1 ? [row] : []
+    });
+
+    if (page < 1) return;
     const collector = reply.createMessageComponentCollector({ time: 30000 });
     collector.on("collect", async (i: ButtonInteraction) => {
       if (i.message.id != (await reply.fetch()).id)
