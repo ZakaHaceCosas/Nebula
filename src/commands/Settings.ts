@@ -85,18 +85,25 @@ export default class Settings {
     const key = interaction.options.getSubcommand() as keyof typeof settingsDefinition;
     const values = interaction.options.data[0].options!;
     if (!values.length) {
-      const embed = new EmbedBuilder().setTitle(`Settings for ${key}`).setColor(genColor(100));
-      const description: string[] = [];
+      const settingsDef = settingsDefinition[key];
+      const field: string[] = [];
+      Object.keys(settingsDef.settings).forEach(name =>
+        field.push(`**${name}**: ${getSetting(guild.id, key, name)?.toString() || "Not set"}`)
+      );
 
-      Object.keys(settingsDefinition[key]).forEach(name => {
-        description.push(`${name}: ${getSetting(guild.id, key, name)?.toString() || "Not set"}`);
-        embed.setDescription(description.join("\n"));
-      });
+      const embed = new EmbedBuilder()
+        .setAuthor({ name: `Settings of ${key}` })
+        .setDescription(`${settingsDef.description}`)
+        .addFields({ name: "🧑‍🔧 • Settings", value: field.join("\n") })
+        .setColor(genColor(100));
 
       return await interaction.reply({ embeds: [embed] });
     }
 
-    const embed = new EmbedBuilder().setTitle(`Parameters changed`).setColor(genColor(100));
+    const embed = new EmbedBuilder()
+      .setAuthor({ name: "Parameters changed" })
+      .setColor(genColor(100));
+
     values.forEach(option => {
       setSetting(guild.id, key, option.name, option.value as string);
       embed.addFields({

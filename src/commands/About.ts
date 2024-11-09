@@ -37,7 +37,7 @@ export default class About {
         {
           name: "📃 • General",
           value: [
-            "Version **0.1**, *Kaishi*",
+            "Version **0.1.1**, *Kaishi*",
             `**${members}** members • **${guilds.size}** guild${guilds.size == 1 ? "" : "s"} ${
               !shards ? "" : `• **${shards}** shard${shards == 1 ? "" : "s"}`
             }`
@@ -47,9 +47,9 @@ export default class About {
           name: "🌌 • Entities involved",
           value: [
             "**Founder**: Goos",
-            "**Translator Lead**: ThatBOI",
             "**Developers**: Dimkauzh, Froxcey, Golem64, Koslz, MQuery, Nikkerudon, Spectrum, ThatBOI",
             "**Designers**: ArtyH, ZakaHaceCosas, Pjanda",
+            "**Translator Lead**: ThatBOI",
             "**Translators**: Dimkauzh, flojo, Golem64, GraczNet, Nikkerudon, ZakaHaceCosas, SaFire, TrulyBlue",
             "**Testers**: Blaze, fishy, Trynera",
             "And **YOU**, for using Sokora."
@@ -58,7 +58,7 @@ export default class About {
         {
           name: "🔗 • Links",
           value:
-            "[GitHub](https://www.github.com/NebulaTheBot) • [YouTube](https://www.youtube.com/@NebulaTheBot) • [Instagram](https://instagram.com/NebulaTheBot) • [Mastodon](https://mastodon.online/@NebulaTheBot@mastodon.social) • [Guilded](https://guilded.gg/Nebula) • [Revolt](https://rvlt.gg/28TS9aXy)"
+            "[GitHub](https://www.github.com/SokoraDesu) • [YouTube](https://www.youtube.com/@SokoraDesu) • [Instagram](https://instagram.com/NebulaTheBot) • [Mastodon](https://mastodon.online/@NebulaTheBot@mastodon.social) • [Revolt](https://rvlt.gg/28TS9aXy)"
         }
       )
       .setFooter({ text: `Made with ${randomise(emojis)} by the Sokora team` })

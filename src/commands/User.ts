@@ -71,7 +71,7 @@ export default class User {
         `**${guildRoles.filter(role => target.roles.cache.has(role.id)).size! - 1}** ${
           memberRoles.length == 1 ? "role" : "roles"
         } • ${memberRoles
-          .slice(0, 5)
+          .slice(0, 3)
           .map(role => `<@&${role[1].id}>`)
           .join(", ")}${rolesLength > 3 ? ` and **${rolesLength - 3}** more` : ""}`
       );

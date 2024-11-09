@@ -41,7 +41,7 @@ export const settingsDefinition: Record<
       },
       cooldown: {
         type: "INTEGER",
-        desc: "Set the cooldown between messages that add XP.",
+        desc: "Set the cooldown between messages that add XP (in seconds).",
         val: 2
       },
       difficulty: {
@@ -156,6 +156,7 @@ export function getSetting<
   const set = settingsDefinition[key].settings[setting];
 
   if (!res.length) {
+    if (!set) return null;
     if (set.type == "LIST") return null;
     return set.val;
   }

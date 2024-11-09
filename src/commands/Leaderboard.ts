@@ -80,32 +80,31 @@ export default class Leaderboard {
       fetchReply: true
     });
 
-    if (totalPages > 1) {
-      const collector = reply.createMessageComponentCollector({
-        time: 30000
+    if (totalPages <= 1) return;
+    const collector = reply.createMessageComponentCollector({
+      time: 30000
+    });
+
+    collector.on("collect", async (i: ButtonInteraction) => {
+      if (i.message.id != (await reply.fetch()).id)
+        return await errorEmbed(
+          i,
+          "For some reason, this click would've caused the bot to error. Thankfully, this message right here prevents that."
+        );
+
+      if (i.user.id != interaction.user.id)
+        return errorEmbed(i, "You are not the person who executed this command.");
+
+      collector.resetTimer({ time: 30000 });
+      if (i.customId == "left") page = page > 1 ? page - 1 : totalPages;
+      else page = page < totalPages ? page + 1 : 1;
+
+      await i.update({
+        embeds: [await generateEmbed()],
+        components: [row]
       });
+    });
 
-      collector.on("collect", async (i: ButtonInteraction) => {
-        if (i.message.id != (await reply.fetch()).id)
-          return await errorEmbed(
-            i,
-            "For some reason, this click would've caused the bot to error. Thankfully, this message right here prevents that."
-          );
-
-        if (i.user.id != interaction.user.id)
-          return errorEmbed(i, "You are not the person who executed this command.");
-
-        collector.resetTimer({ time: 30000 });
-        if (i.customId == "left") page = page > 1 ? page - 1 : totalPages;
-        else page = page < totalPages ? page + 1 : 1;
-
-        await i.update({
-          embeds: [await generateEmbed()],
-          components: [row]
-        });
-      });
-
-      collector.on("end", async () => await interaction.editReply({ components: [] }));
-    }
+    collector.on("end", async () => await interaction.editReply({ components: [] }));
   }
 }

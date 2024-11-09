@@ -1,6 +1,7 @@
 import {
   Guild,
   SlashCommandBuilder,
+  SlashCommandSubcommandBuilder,
   SlashCommandSubcommandGroupBuilder,
   type Client
 } from "discord.js";
@@ -9,18 +10,18 @@ import { join } from "path";
 import { pathToFileURL } from "url";
 import { getDisabledCommands } from "../utils/database/disabledCommands";
 
+export let commands: { data: SlashCommandBuilder; run: any; autocomplete: any }[] = [];
+let subcommands: { data: SlashCommandSubcommandBuilder; run: any; autocomplete: any }[] = [];
 export class Commands {
   client: Client;
-  commands: any[] = [];
   constructor(client: Client) {
     this.client = client;
   }
 
-  private async createSubCommand(
-    name: string,
-    ...disabledCommands: string[]
-  ): Promise<SlashCommandBuilder> {
+  private async createSubCommand(name: string, ...disabledCommands: string[]) {
     const commandsPath = join(process.cwd(), "src", "commands");
+    const run = [];
+    const autocomplete = [];
     const command = new SlashCommandBuilder()
       .setName(name.toLowerCase())
       .setDescription("This command has no description.");
@@ -43,7 +44,17 @@ export class Commands {
         const subCommand = new subCommandModule.default();
 
         command.addSubcommand(subCommand.data);
-        if ("autocompleteHandler" in subCommand) subCommand.autocompleteHandler(this.client);
+        run.push(subCommand.run);
+        subcommands.push({
+          data: subCommand.data,
+          run: subCommand.run,
+          autocomplete: subCommand.autocomplete
+        });
+
+        if ("autocompleteHandler" in subCommand) {
+          subCommand.autocompleteHandler(this.client);
+          autocomplete.push(subCommand.autocomplete);
+        }
         continue;
       }
 
@@ -76,12 +87,11 @@ export class Commands {
       command.addSubcommandGroup(subCommandGroup);
     }
 
-    return command;
+    return { data: command, run: run, autocomplete: autocomplete };
   }
 
   async loadCommands(...disabledCommands: string[]) {
     const commandsPath = join(process.cwd(), "src", "commands");
-    this.commands = [];
     const commandFiles = readdirSync(commandsPath, { withFileTypes: true });
 
     for (const commandFile of commandFiles) {
@@ -90,7 +100,7 @@ export class Commands {
 
       if (commandFile.isFile()) {
         const commandImport = await import(pathToFileURL(join(commandsPath, name)).toString());
-        this.commands.push(new commandImport.default().data);
+        commands.push(new commandImport.default());
         continue;
       }
 
@@ -99,13 +109,20 @@ export class Commands {
         join(commandsPath, name),
         ...disabledCommands
       );
-      this.commands.push(subCommand);
+
+      commands.push({
+        data: subCommand.data,
+        run: subCommand.run,
+        autocomplete: subCommand.autocomplete
+      });
     }
+
+    return commands;
   }
 
   async registerCommandsForGuild(guild: Guild, ...disabledCommands: string[]) {
     await this.loadCommands(...disabledCommands);
-    await guild.commands.set(this.commands);
+    await guild.commands.set(commands.map(command => command.data));
   }
 
   async registerCommands(): Promise<any[]> {
@@ -115,9 +132,18 @@ export class Commands {
     for (const guildID of guilds.keys()) {
       const disabledCommands = getDisabledCommands(guildID);
       if (disabledCommands.length > 0) await this.loadCommands(...disabledCommands);
-      await guilds.get(guildID)?.commands.set(this.commands);
+      await guilds.get(guildID)?.commands.set(commands.map(command => command.data));
     }
 
-    return this.commands;
+    return commands;
+  }
+
+  async getCommand(name: string, options: any) {
+    const subcommandName = options.getSubcommand(false);
+
+    const command = commands.filter(command => command.data.name == name)[0];
+    const subcommand = subcommands.filter(subcommand => subcommand.data.name == subcommandName)[0];
+    if (!subcommand) return command;
+    return subcommand;
   }
 }
