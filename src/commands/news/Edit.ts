@@ -44,7 +44,7 @@ export default class Edit {
       );
 
     const id = interaction.options.getString("id")!;
-    const news = get(id);
+    const news = get(guild.id, id);
     if (!news) return await errorEmbed(interaction, "The specified news don't exist.");
 
     const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(
