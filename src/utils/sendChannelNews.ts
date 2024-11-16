@@ -26,7 +26,7 @@ export async function sendChannelNews(
   title?: string,
   body?: string
 ) {
-  const news = get(id)!;
+  const news = get(guild.id, id)!;
   const role = getSetting(guild.id, "news", "role_id") as string;
   let roleToSend: Role | undefined;
   if (role) roleToSend = guild.roles.cache.get(role);
@@ -48,5 +48,5 @@ export async function sendChannelNews(
       embeds: [embed],
       content: roleToSend ? `<@&${roleToSend.id}>` : undefined
     })
-    .then(message => updateNews(id, undefined, undefined, message.id));
+    .then(message => updateNews(guild.id, id, undefined, undefined, message.id));
 }
