@@ -16,7 +16,7 @@ export default (async function run(member: GuildMember) {
 
   const avatar = member.displayAvatarURL();
   const embed = new EmbedBuilder()
-    .setAuthor({ name: `•  ${member.user.displayName} has left`, iconURL: avatar })
+    .setAuthor({ name: `•  ${member.user.displayName} has left.`, iconURL: avatar })
     .setFooter({ text: `User ID: ${member.id}` })
     .setThumbnail(avatar)
     .setColor(member.user.hexAccentColor ?? (await imageColor(undefined, avatar)) ?? genColor(200));

@@ -8,6 +8,7 @@ import {
 } from "discord.js";
 import { genColor } from "../utils/colorGen";
 import { imageColor } from "../utils/imageColor";
+import { pluralOrNot } from "../utils/pluralOrNot";
 import { randomise } from "../utils/randomise";
 
 export default class About {
@@ -37,28 +38,20 @@ export default class About {
         {
           name: "📃 • General",
           value: [
-            "Version **0.1.1**, *Kaishi*",
-            `**${members}** members • **${guilds.size}** guild${guilds.size == 1 ? "" : "s"} ${
-              !shards ? "" : `• **${shards}** shard${shards == 1 ? "" : "s"}`
+            "Version **0.2.0**, *Kaishi*",
+            `**${members}** ${pluralOrNot("member", members)} • **${guilds.size}** ${pluralOrNot("guild", guilds.size)} ${
+              !shards ? "" : `• **${shards}** ${pluralOrNot("shard", shards)}`
             }`
-          ].join("\n")
-        },
-        {
-          name: "🌌 • Entities involved",
-          value: [
-            "**Founder**: Goos",
-            "**Developers**: Dimkauzh, Froxcey, Golem64, Koslz, MQuery, Nikkerudon, Spectrum, ThatBOI",
-            "**Designers**: ArtyH, ZakaHaceCosas, Pjanda",
-            "**Translator Lead**: ThatBOI",
-            "**Translators**: Dimkauzh, flojo, Golem64, GraczNet, Nikkerudon, ZakaHaceCosas, SaFire, TrulyBlue",
-            "**Testers**: Blaze, fishy, Trynera",
-            "And **YOU**, for using Sokora."
           ].join("\n")
         },
         {
           name: "🔗 • Links",
           value:
-            "[GitHub](https://www.github.com/SokoraDesu) • [YouTube](https://www.youtube.com/@SokoraDesu) • [Instagram](https://instagram.com/NebulaTheBot) • [Mastodon](https://mastodon.online/@NebulaTheBot@mastodon.social) • [Revolt](https://rvlt.gg/28TS9aXy)"
+            "[Discord](https://discord.gg/c6C25P4BuY) • [GitHub](https://www.github.com/SokoraDesu) • [YouTube](https://www.youtube.com/@SokoraDesu) • [Instagram](https://instagram.com/NebulaTheBot) • [Mastodon](https://mastodon.online/@NebulaTheBot@mastodon.social) • [Matrix](https://matrix.to/#/#sokora:matrix.org) • [Revolt](https://rvlt.gg/28TS9aXy)"
+        },
+        {
+          name: "📚 • ToS and the Privacy Policy",
+          value: "[ToS](https://sokora.org/terms)  • [Privacy Policy](https://sokora.org/privacy)"
         }
       )
       .setFooter({ text: `Made with ${randomise(emojis)} by the Sokora team` })
@@ -66,6 +59,11 @@ export default class About {
       .setColor(user.hexAccentColor ?? (await imageColor(undefined, avatar)) ?? genColor(270));
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setLabel("• Vote")
+        .setURL("https://top.gg/bot/873918300726394960/vote")
+        .setEmoji("🗳️")
+        .setStyle(ButtonStyle.Link),
       new ButtonBuilder()
         .setLabel("•  Donate")
         .setURL("https://paypal.me/SokoraTheBot")

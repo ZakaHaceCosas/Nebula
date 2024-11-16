@@ -1,4 +1,4 @@
-import { codeBlock, EmbedBuilder } from "discord.js";
+import { EmbedBuilder, blockQuote } from "discord.js";
 import { genColor } from "../utils/colorGen";
 import { getSetting } from "../utils/database/settings";
 import { logChannel } from "../utils/logChannel";
@@ -17,20 +17,21 @@ export default (async function run(oldMessage, newMessage) {
 
   const embed = new EmbedBuilder()
     .setAuthor({
-      name: `•  ${author.displayName}'s message has been edited`,
+      name: `•  ${author.displayName} edited a message.`,
       iconURL: author.displayAvatarURL()
     })
+    .setDescription(`[Jump to message](${oldMessage.url})`)
     .addFields(
       {
-        name: "🕰️ • Old message",
-        value: codeBlock(oldContent)
+        name: "🖋️ • Old message",
+        value: oldContent
       },
       {
-        name: "🔄️ • New message",
-        value: codeBlock(newContent)
+        name: "🖊️ • New message",
+        value: newContent
       }
     )
-    .setFooter({ text: `Message ID: ${oldMessage.id}\nUser ID: ${author.id}` })
+    .setFooter({ text: `User ID: ${author.id}` })
     .setColor(genColor(60));
 
   await logChannel(guild, embed);

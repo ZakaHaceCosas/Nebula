@@ -57,10 +57,10 @@ export default class Slowdown {
     const reason = interaction.options.getString("reason");
     const channelOption = interaction.options.getChannel("channel")!;
     const channel = guild.channels.cache.get(interaction.channel?.id ?? channelOption.id)!;
-    let title = `Set a slowdown of \`${channelOption ?? `${channel.name}`}\` to ${ms(ms(time), {
+    let title = `Set a slowdown of ${channelOption ?? `${channel.name}`} to ${ms(ms(time), {
       long: true
     })}.`;
-    if (!ms(time)) title = `Removed the slowdown from \`${channelOption ?? `${channel.name}`}\`.`;
+    if (!ms(time)) title = `Removed the slowdown from ${channelOption ?? `${channel.name}`}.`;
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: title })
@@ -68,7 +68,7 @@ export default class Slowdown {
         [
           `**Moderator**: ${interaction.user.displayName}`,
           reason ? `**Reason**: ${reason}` : "*No reason provided*",
-          `**Channel**: ${channelOption ?? `<#${channel.id}>**`}`
+          `**Channel**: ${channelOption ?? `<#${channel.id}>`}`
         ].join("\n")
       )
       .setColor(genColor(100));

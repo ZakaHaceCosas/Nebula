@@ -11,7 +11,7 @@ export default (async function run(member) {
   const user = member.user;
   const avatar = member.displayAvatarURL();
   const embed = new EmbedBuilder()
-    .setAuthor({ name: `•  ${user.displayName} has joined`, iconURL: avatar })
+    .setAuthor({ name: `•  ${user.displayName} has joined.`, iconURL: avatar })
     .setFooter({ text: `User ID: ${member.id}` })
     .setThumbnail(avatar)
     .setColor(member.user.hexAccentColor ?? (await imageColor(undefined, avatar)) ?? genColor(200));

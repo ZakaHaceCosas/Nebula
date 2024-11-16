@@ -13,6 +13,7 @@ import { getLevel } from "../utils/database/leveling";
 import { getSetting } from "../utils/database/settings";
 import { errorEmbed } from "../utils/embeds/errorEmbed";
 import { imageColor } from "../utils/imageColor";
+import { pluralOrNot } from "../utils/pluralOrNot";
 
 export default class User {
   data: SlashCommandOptionsOnlyBuilder;
@@ -68,9 +69,10 @@ export default class User {
 
     if (memberRoles.length)
       serverInfo.push(
-        `**${guildRoles.filter(role => target.roles.cache.has(role.id)).size! - 1}** ${
-          memberRoles.length == 1 ? "role" : "roles"
-        } • ${memberRoles
+        `**${guildRoles.filter(role => target.roles.cache.has(role.id)).size! - 1}** ${pluralOrNot(
+          "role",
+          memberRoles.length
+        )} • ${memberRoles
           .slice(0, 3)
           .map(role => `<@&${role[1].id}>`)
           .join(", ")}${rolesLength > 3 ? ` and **${rolesLength - 3}** more` : ""}`

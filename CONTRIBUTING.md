@@ -18,7 +18,7 @@
 - Run `bun run setup` and our cli tool will install dependencies and write .env for you
 
 ### Running
-- Run `bun start`.
+- Run `bun dev`.
 
 Be sure to open a pull request when you're ready to push your changes. Be descriptive of the changes you've made.
 
