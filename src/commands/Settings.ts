@@ -47,8 +47,24 @@ export default class Settings {
                 .setRequired(false)
             );
             break;
+          case "CHANNEL":
+            subcommand.addChannelOption(option =>
+              option
+                .setName(sub)
+                .setDescription(settingsDefinition[key].settings[sub]["desc"])
+                .setRequired(false)
+            );
+            break;
           case "USER":
             subcommand.addUserOption(option =>
+              option
+                .setName(sub)
+                .setDescription(settingsDefinition[key].settings[sub]["desc"])
+                .setRequired(false)
+            );
+            break;
+          case "ROLE":
+            subcommand.addRoleOption(option =>
               option
                 .setName(sub)
                 .setDescription(settingsDefinition[key].settings[sub]["desc"])

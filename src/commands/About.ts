@@ -38,7 +38,7 @@ export default class About {
         {
           name: "📃 • General",
           value: [
-            "Version **0.2.0**, *Kaishi*",
+            "Version **0.1.2**, *Kaishi*",
             `**${members}** ${pluralOrNot("member", members)} • **${guilds.size}** ${pluralOrNot("guild", guilds.size)} ${
               !shards ? "" : `• **${shards}** ${pluralOrNot("shard", shards)}`
             }`
@@ -46,12 +46,10 @@ export default class About {
         },
         {
           name: "🔗 • Links",
-          value:
-            "[Discord](https://discord.gg/c6C25P4BuY) • [GitHub](https://www.github.com/SokoraDesu) • [YouTube](https://www.youtube.com/@SokoraDesu) • [Instagram](https://instagram.com/NebulaTheBot) • [Mastodon](https://mastodon.online/@NebulaTheBot@mastodon.social) • [Matrix](https://matrix.to/#/#sokora:matrix.org) • [Revolt](https://rvlt.gg/28TS9aXy)"
-        },
-        {
-          name: "📚 • ToS and the Privacy Policy",
-          value: "[ToS](https://sokora.org/terms)  • [Privacy Policy](https://sokora.org/privacy)"
+          value: [
+            "[Discord](https://discord.gg/c6C25P4BuY) • [GitHub](https://www.github.com/SokoraDesu) • [YouTube](https://www.youtube.com/@SokoraDesu) • [Instagram](https://instagram.com/NebulaTheBot) • [Mastodon](https://mastodon.online/@NebulaTheBot@mastodon.social) • [Matrix](https://matrix.to/#/#sokora:matrix.org) • [Revolt](https://rvlt.gg/28TS9aXy)",
+            "Also, please read the [ToS](https://sokora.org/terms) and the [privacy policy](https://sokora.org/privacy)."
+          ].join("\n")
         }
       )
       .setFooter({ text: `Made with ${randomise(emojis)} by the Sokora team` })

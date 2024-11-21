@@ -12,29 +12,23 @@ export default class Credits {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const client = interaction.client;
-    const user = client.user;
-    const guilds = client.guilds.cache;
-    const members = guilds.map(guild => guild.memberCount).reduce((a, b) => a + b);
-    const shards = client.shard?.count;
+    const user = interaction.client.user;
     const avatar = user.displayAvatarURL();
     let emojis = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
     if (Math.round(Math.random() * 100) <= 5) emojis = ["⌨️", "💻", "🖥️"];
 
     const embed = new EmbedBuilder()
-      .setAuthor({ name: "•  Credits", iconURL: avatar })
-      .setFields({
-        name: "🌌 • Entities involved",
-        value: [
+      .setAuthor({ name: "•  Entities involved", iconURL: avatar })
+      .setDescription(
+        [
           "**Founder**: Goos",
           "**Developers**: Dimkauzh, Froxcey, Golem64, Koslz, MQuery, Nikkerudon, Spectrum, ThatBOI",
           "**Designers**: ArtyH, ZakaHaceCosas, Pjanda",
           "**Translator Lead**: ThatBOI",
           "**Translators**: Dimkauzh, flojo, Golem64, GraczNet, Nikkerudon, ZakaHaceCosas, SaFire, TrulyBlue",
-          "**Testers**: Blaze, fishy, Trynera",
-          "And **YOU**, for using Sokora."
+          "**Testers**: Blaze, fishy, Trynera"
         ].join("\n")
-      })
+      )
       .setFooter({ text: `Made with ${randomise(emojis)} by the Sokora team` })
       .setThumbnail(avatar)
       .setColor(user.hexAccentColor ?? (await imageColor(undefined, avatar)) ?? genColor(270));

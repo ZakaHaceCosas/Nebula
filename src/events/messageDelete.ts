@@ -1,4 +1,4 @@
-import { codeBlock, EmbedBuilder } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { genColor } from "../utils/colorGen";
 import { getSetting } from "../utils/database/settings";
 import { logChannel } from "../utils/logChannel";
@@ -17,11 +17,11 @@ export default (async function run(message) {
       iconURL: author.displayAvatarURL()
     })
     .addFields({
-      name: "🗞️ • Deleted message",
-      value: codeBlock(message.content!)
+      name: "🗑️ • Deleted message",
+      value: message.content!
     })
     .setFooter({ text: `Message ID: ${message.id}\nUser ID: ${author.id}` })
-    .setColor(genColor(60));
+    .setColor(genColor(0));
 
   await logChannel(guild, embed);
 } as Event<"messageDelete">);

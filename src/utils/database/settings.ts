@@ -27,17 +27,17 @@ export const settingsDefinition: Record<
         val: true
       },
       channel: {
-        type: "TEXT",
+        type: "CHANNEL",
         desc: "ID of the log channel for leveling-related stuff (i.e someone leveling up)."
       },
       block_channels: {
-        type: "TEXT",
+        type: "CHANNEL",
         desc: "ID(s) of the channels where messages aren't counted, comma separated."
       },
       xp_gain: {
         type: "INTEGER",
         desc: "Set the amount of XP a user gains per message.",
-        val: 5
+        val: 2
       },
       cooldown: {
         type: "INTEGER",
@@ -55,7 +55,7 @@ export const settingsDefinition: Record<
     description: "Change where Sokora sends moderation logs.",
     settings: {
       channel: {
-        type: "TEXT",
+        type: "CHANNEL",
         desc: "ID of the log channel for moderation-related stuff (i.e a message being edited)."
       },
       log_messages: {
@@ -69,11 +69,11 @@ export const settingsDefinition: Record<
     description: "Configure news for your server.",
     settings: {
       channel_id: {
-        type: "TEXT",
+        type: "CHANNEL",
         desc: "ID of the channel where news messages are sent."
       },
       role_id: {
-        type: "TEXT",
+        type: "ROLE",
         desc: "ID of the roles that should be pinged when a news message is sent."
       },
       edit_original_message: {
@@ -106,7 +106,7 @@ export const settingsDefinition: Record<
         desc: "Text sent when a user leaves. (name) - username, (count) - member count, (servername) - server name.",
         val: "(name) has left the server! 😥"
       },
-      channel: { type: "TEXT", desc: "ID of the channel where welcome messages are sent." },
+      channel: { type: "CHANNEL", desc: "ID of the channel where welcome messages are sent." },
       join_dm: {
         type: "BOOL",
         desc: "Whether or not the bot should send a custom DM message to the user upon joining.",
@@ -168,6 +168,8 @@ export function getSetting<
       return (res[0].value === "1" ? true : false) as SqlType<typeof set.type>;
     case "INTEGER":
       return parseInt(res[0].value) as SqlType<typeof set.type>;
+    case "CHANNEL":
+      return res[0].value;
     case "LIST":
       return kominator(res[0].value) as SqlType<typeof set.type>;
     default:

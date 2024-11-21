@@ -1,4 +1,4 @@
-import { EmbedBuilder, blockQuote } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { genColor } from "../utils/colorGen";
 import { getSetting } from "../utils/database/settings";
 import { logChannel } from "../utils/logChannel";
