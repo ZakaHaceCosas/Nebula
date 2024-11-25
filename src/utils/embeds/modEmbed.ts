@@ -49,7 +49,7 @@ export async function errorCheck(
     return await errorEmbed(
       interaction,
       "You can't execute this command.",
-      `You're missing the **${permissionAction} Members** permission.`
+      `You're missing the **${permissionAction}** permission.`
     );
 
   if (!allErrors) return;
