@@ -52,15 +52,15 @@ export default class Mute {
       Date.parse(new Date().toISOString()) + Date.parse(new Date(ms(duration)).toISOString())
     ).toISOString();
 
-    await interaction.guild?.members.cache
-      .get(user.id)
-      ?.edit({ communicationDisabledUntil: time, reason: reason ?? undefined })
-      .catch(error => console.error(error));
-
     await modEmbed(
       { interaction, user, action: "Muted", duration, dm: true, dbAction: "MUTE" },
       reason,
       true
     );
+
+    await interaction.guild?.members.cache
+      .get(user.id)
+      ?.edit({ communicationDisabledUntil: time, reason: reason ?? undefined })
+      .catch(error => console.error(error));
   }
 }

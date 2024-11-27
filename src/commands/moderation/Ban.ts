@@ -60,14 +60,13 @@ export default class Ban {
     }
 
     try {
+      await modEmbed(
+        { interaction, user, action: "Banned", duration, dm: true, dbAction: "BAN", expiresAt },
+        reason
+      );
       await guild.members.ban(user.id, { reason: reason ?? undefined });
     } catch (err) {
       console.error("Failed to ban user:", err);
     }
-
-    await modEmbed(
-      { interaction, user, action: "Banned", duration, dm: true, dbAction: "BAN", expiresAt },
-      reason
-    );
   }
 }

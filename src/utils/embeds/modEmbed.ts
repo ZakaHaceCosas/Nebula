@@ -110,7 +110,7 @@ export async function modEmbed(
   let author = `•  ${action} ${name}`;
   reason ? generalValues.push(`**Reason**: ${reason}`) : generalValues.push("*No reason provided*");
   if (duration) generalValues.push(`**Duration**: ${ms(ms(duration), { long: true })}`);
-  if (dbAction) {
+  if (dbAction)
     try {
       const id = addModeration(
         guild.id,
@@ -124,7 +124,6 @@ export async function modEmbed(
     } catch (error) {
       console.error(error);
     }
-  }
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: author, iconURL: user.displayAvatarURL() })
@@ -139,17 +138,21 @@ export async function modEmbed(
   if (!dm) return;
   const dmChannel = await user.createDM().catch(() => null);
   if (!dmChannel || !guild.members.cache.get(user.id) || user.bot) return;
-  await dmChannel
-    .send({
-      embeds: [
-        embed
-          .setAuthor({
-            name: `•  You got ${action.toLowerCase()}.`,
-            iconURL: user.displayAvatarURL()
-          })
-          .setDescription(generalValues.slice(+!showModerator, generalValues.length).join("\n"))
-          .setColor(genColor(0))
-      ]
-    })
-    .catch(() => null);
+  try {
+    await dmChannel
+      .send({
+        embeds: [
+          embed
+            .setAuthor({
+              name: `•  You got ${action.toLowerCase()}.`,
+              iconURL: user.displayAvatarURL()
+            })
+            .setDescription(generalValues.slice(+!showModerator, generalValues.length).join("\n"))
+            .setColor(genColor(0))
+        ]
+      })
+      .catch(() => null);
+  } catch (e) {
+    return console.log(e);
+  }
 }

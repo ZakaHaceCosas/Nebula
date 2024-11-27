@@ -46,7 +46,7 @@ export default class Unban {
         "The user was never banned."
       );
 
-    await guild.members.unban(id, reason ?? undefined).catch(error => console.error(error));
     await modEmbed({ interaction, user: target, action: "Unbanned" }, reason);
+    await guild.members.unban(id, reason ?? undefined).catch(error => console.error(error));
   }
 }

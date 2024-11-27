@@ -40,11 +40,10 @@ export default class Kick {
       );
 
     const reason = interaction.options.getString("reason");
+    await modEmbed({ interaction, user, action: "Kicked", dm: true, dbAction: "KICK" }, reason);
     await interaction.guild?.members.cache
       .get(user.id)
       ?.kick(reason ?? undefined)
       .catch(error => console.error(error));
-
-    await modEmbed({ interaction, user, action: "Kicked", dm: true, dbAction: "KICK" }, reason);
   }
 }

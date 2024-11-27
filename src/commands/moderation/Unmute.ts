@@ -37,7 +37,7 @@ export default class Unmute {
         "The user was never muted."
       );
 
-    await target.edit({ communicationDisabledUntil: null }).catch(error => console.error(error));
     await modEmbed({ interaction, user, action: "Unmuted" });
+    await target.edit({ communicationDisabledUntil: null }).catch(error => console.error(error));
   }
 }

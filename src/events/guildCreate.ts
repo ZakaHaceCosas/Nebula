@@ -1,14 +1,14 @@
 import { EmbedBuilder, type DMChannel } from "discord.js";
-import { Commands } from "../handlers/commands";
+import { commands } from "../handlers/commands";
 import { genColor } from "../utils/colorGen";
 import { randomise } from "../utils/randomise";
 import { Event } from "../utils/types";
 
 export default (async function run(guild) {
-  const dmChannel = (await (await guild.fetchOwner()).createDM().catch(() => null)) as
-    | DMChannel
-    | undefined;
+  const owner = await guild.fetchOwner();
+  if (owner.user.bot) return;
 
+  const dmChannel = (await owner.createDM().catch(() => null)) as DMChannel | undefined;
   let emojis = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
   if (Math.round(Math.random() * 100) <= 5) emojis = ["⌨️", "💻", "🖥️"];
 
@@ -29,6 +29,10 @@ export default (async function run(guild) {
     .setThumbnail(client.user.displayAvatarURL())
     .setColor(genColor(200));
 
-  await new Commands(client).registerCommandsForGuild(guild);
-  if (dmChannel) await dmChannel.send({ embeds: [embed] });
+  await guild.commands.set(commands.map(command => command.data));
+  try {
+    if (dmChannel) await dmChannel.send({ embeds: [embed] });
+  } catch (e) {
+    console.log(e);
+  }
 } as Event<"guildCreate">);

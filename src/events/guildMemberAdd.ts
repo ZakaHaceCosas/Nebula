@@ -31,5 +31,9 @@ export default (async function run(member) {
   if (user.bot) return;
 
   replace(member, getSetting(guildID, "welcome", "dm_text") as string, embed);
-  await dmChannel.send({ embeds: [embed] }).catch(() => null);
+  try {
+    await dmChannel.send({ embeds: [embed] }).catch(() => null);
+  } catch (e) {
+    return console.log(e);
+  }
 } as Event<"guildMemberAdd">);
