@@ -20,6 +20,7 @@ type ErrorOptions = {
   botError: boolean;
   ownerError?: boolean;
   outsideError?: boolean;
+  unbanError?: boolean;
 };
 
 export async function errorCheck(
@@ -29,13 +30,11 @@ export async function errorCheck(
   permissionAction: string
 ) {
   const { interaction, user, action } = options;
-  const { allErrors, botError, ownerError, outsideError } = errorOptions;
+  const { allErrors, botError, ownerError, outsideError, unbanError } = errorOptions;
   const guild = interaction.guild!;
   const members = guild.members.cache!;
   const member = members.get(interaction.user.id)!;
   const client = members.get(interaction.client.user.id)!;
-  const target = members.get(user.id)!;
-  const name = user.displayName;
 
   if (botError)
     if (!client.permissions.has(permission))
@@ -52,7 +51,17 @@ export async function errorCheck(
       `You're missing the **${permissionAction}** permission.`
     );
 
+  if (unbanError)
+    if (!user)
+      return await errorEmbed(
+        interaction,
+        "You can't unban this user.",
+        "The user was never banned."
+      );
+
   if (!allErrors) return;
+  const target = members.get(user.id)!;
+  const name = user.displayName;
   if (!target) return;
   if (target == member)
     return await errorEmbed(interaction, `You can't ${action.toLowerCase()} yourself.`);
@@ -83,7 +92,7 @@ export async function errorCheck(
       );
   }
 
-  if (outsideError) {
+  if (outsideError)
     if (
       !(await guild.members
         .fetch(user.id)
@@ -95,7 +104,6 @@ export async function errorCheck(
         `You can't ${action.toLowerCase()} ${name}.`,
         "This user isn't in this server."
       );
-  }
 }
 
 export async function modEmbed(

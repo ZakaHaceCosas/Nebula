@@ -33,18 +33,11 @@ export default class Unban {
       await errorCheck(
         PermissionsBitField.Flags.BanMembers,
         { interaction, user: target, action: "Unban" },
-        { allErrors: false, botError: true, ownerError: true },
+        { allErrors: false, botError: true, ownerError: true, unbanError: true },
         "Ban Members"
       )
     )
       return;
-
-    if (!target)
-      return await errorEmbed(
-        interaction,
-        "You can't unban this user.",
-        "The user was never banned."
-      );
 
     await modEmbed({ interaction, user: target, action: "Unbanned" }, reason);
     await guild.members.unban(id, reason ?? undefined).catch(error => console.error(error));

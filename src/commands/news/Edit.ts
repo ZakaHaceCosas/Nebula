@@ -102,8 +102,8 @@ export default class Edit {
         content: roleToSend ? `<@&${roleToSend.id}>` : undefined
       });
 
-      updateNews(id, title, body);
-      await interaction.reply({
+      updateNews(guild.id, id, title, body);
+      await i.reply({
         embeds: [new EmbedBuilder().setTitle("News edited.").setColor(genColor(100))],
         ephemeral: true
       });
