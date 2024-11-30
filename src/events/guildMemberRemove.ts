@@ -21,6 +21,14 @@ export default (async function run(member: GuildMember) {
     .setThumbnail(avatar)
     .setColor(member.user.hexAccentColor ?? (await imageColor(undefined, avatar)) ?? genColor(200));
 
-  replace(member, getSetting(guildID, "welcome", "leave_text") as string, embed);
+  replace(
+    getSetting(guildID, "welcome", "leave_text") as string,
+    [
+      { text: "(name)", replacement: member.user.displayName },
+      { text: "(count)", replacement: member.guild.memberCount },
+      { text: "(servername)", replacement: member.guild.name }
+    ],
+    embed
+  );
   await channel.send({ embeds: [embed] });
 } as Event<"guildMemberRemove">);

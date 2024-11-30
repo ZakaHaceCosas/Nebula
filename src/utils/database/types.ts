@@ -22,7 +22,7 @@ export type SqlType<T extends FieldData> = {
   CHANNEL: string;
   USER: string;
   ROLE: string;
-  COMMAND: string[];
+  COMMAND: string;
   LIST: any[];
 }[T];
 

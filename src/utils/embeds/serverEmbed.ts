@@ -79,7 +79,7 @@ export async function serverEmbed(options: Options) {
       name: `🗨️ • ${channelSizes.text + channelSizes.voice} ${pluralOrNot("channel", channelSizes.text + channelSizes.voice)}`,
       value: [
         `**${channelSizes.text}** text • **${channelSizes.voice}** voice`,
-        `**${channelSizes.categories}** categor${channelSizes.categories == 1 ? "y" : "ies"}`
+        `**${channelSizes.categories}** ${pluralOrNot("category", channelSizes.categories)}`
       ].join("\n"),
       inline: true
     },

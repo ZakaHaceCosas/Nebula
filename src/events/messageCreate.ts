@@ -43,20 +43,27 @@ export default (async function run(message) {
   const levelChannelId = getSetting(guild.id, "leveling", "channel");
   const difficulty = getSetting(guild.id, "leveling", "difficulty") as number;
   const [level, xp] = getLevel(guild.id, author.id);
-  const xpUntilLevelUp = Math.floor(
-    100 * difficulty * (level + 1) ** 2 - 85 * difficulty * level ** 2
-  );
   const newLevelData = { level: level ?? 0, xp: xp + xpGain };
+  const levelUpXp =
+    100 * difficulty * (newLevelData.level + 1) ** 2 - 80 * difficulty * newLevelData.level ** 2;
 
-  if (newLevelData.xp < xpUntilLevelUp)
+  while (
+    newLevelData.xp <
+    100 * difficulty * (newLevelData.level + 1) ** 2 - 80 * difficulty * newLevelData.level ** 2
+  )
+    newLevelData.level--;
+
+  if (newLevelData.xp < levelUpXp)
     return setLevel(guild.id, author.id, newLevelData.level, newLevelData.xp);
 
   while (
     newLevelData.xp >=
-    100 * difficulty * (newLevelData.level + 1) ** 2 - 85 * difficulty * newLevelData.level ** 2
+    100 * difficulty * (newLevelData.level + 1) ** 2 - 80 * difficulty * newLevelData.level ** 2
   )
     newLevelData.level++;
 
+  console.log(`old: ${xp}, new: ${newLevelData.xp}`);
+  console.log(`old: ${level}, new: ${newLevelData.level}`);
   setLevel(guild.id, author.id, newLevelData.level, newLevelData.xp);
   const embed = new EmbedBuilder()
     .setAuthor({
@@ -66,8 +73,8 @@ export default (async function run(message) {
     .setDescription(
       [
         `**Congratulations, ${author.displayName}**!`,
-        `You made it to **level ${level + 1}**`,
-        `You need ${Math.floor(100 * difficulty * (level + 2))} XP to level up again.`
+        `You made it to **level ${level + 1}**.`,
+        `You need ${100 * difficulty * (newLevelData.level + 1) ** 2 - 80 * difficulty * newLevelData.level ** 2} XP to level up again.`
       ].join("\n")
     )
     .setThumbnail(author.displayAvatarURL())
