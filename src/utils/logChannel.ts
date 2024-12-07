@@ -34,5 +34,7 @@ export async function logChannel(guild: Guild, embed: EmbedBuilder) {
     })
     .catch(() => null);
 
-  if (channel) return await channel.send({ embeds: [embed] });
+  if (!channel) return;
+  if (!channel.permissionsFor(guild.client.user)?.has("ViewChannel")) return;
+  return await channel.send({ embeds: [embed] });
 }

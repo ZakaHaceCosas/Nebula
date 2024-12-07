@@ -1,8 +1,4 @@
-import {
-  PermissionsBitField,
-  SlashCommandSubcommandBuilder,
-  type ChatInputCommandInteraction
-} from "discord.js";
+import { SlashCommandSubcommandBuilder, type ChatInputCommandInteraction } from "discord.js";
 import ms from "ms";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
@@ -33,7 +29,7 @@ export default class Mute {
     const reason = interaction.options.getString("reason");
     if (
       await errorCheck(
-        PermissionsBitField.Flags.ModerateMembers,
+        "ModerateMembers",
         { interaction, user, action: "Mute" },
         { allErrors: true, botError: true, ownerError: true },
         "Moderate Members"

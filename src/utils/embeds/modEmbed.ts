@@ -1,4 +1,9 @@
-import { EmbedBuilder, type ChatInputCommandInteraction, type User } from "discord.js";
+import {
+  EmbedBuilder,
+  type PermissionResolvable,
+  type ChatInputCommandInteraction,
+  type User
+} from "discord.js";
 import ms from "ms";
 import { genColor } from "../colorGen";
 import { addModeration, type modType } from "../database/moderation";
@@ -24,7 +29,7 @@ type ErrorOptions = {
 };
 
 export async function errorCheck(
-  permission: bigint,
+  permission: PermissionResolvable,
   options: Options,
   errorOptions: ErrorOptions,
   permissionAction: string

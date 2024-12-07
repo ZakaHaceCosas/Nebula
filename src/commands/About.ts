@@ -6,6 +6,7 @@ import {
   SlashCommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
+import { version } from "../../package.json";
 import { genColor } from "../utils/colorGen";
 import { imageColor } from "../utils/imageColor";
 import { pluralOrNot } from "../utils/pluralOrNot";
@@ -38,7 +39,7 @@ export default class About {
         {
           name: "📃 • General",
           value: [
-            "Version **0.1.2**, *Kaishi*",
+            `Version **${version}**, *Kaishi*`,
             `**${members}** ${pluralOrNot("member", members)} • **${guilds.size}** ${pluralOrNot("guild", guilds.size)} ${
               !shards ? "" : `• **${shards}** ${pluralOrNot("shard", shards)}`
             }`

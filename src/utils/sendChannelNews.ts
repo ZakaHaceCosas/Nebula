@@ -39,11 +39,13 @@ export async function sendChannelNews(
     .setFooter({ text: `Latest news from ${guild.name}\nID: ${news.id}` })
     .setColor(genColor(200));
 
-  return (
-    guild.channels.cache.get(
-      (getSetting(guild.id, "news", "channel_id") as string) ?? interaction.channel?.id
-    ) as TextChannel
-  )
+  const channel = guild.channels.cache.get(
+    (getSetting(guild.id, "news", "channel_id") as string) ?? interaction.channel?.id
+  ) as TextChannel;
+  if (!channel) return;
+  if (!channel.permissionsFor(guild.client.user)?.has("ViewChannel")) return;
+
+  return await channel
     .send({
       embeds: [embed],
       content: roleToSend ? `<@&${roleToSend.id}>` : undefined

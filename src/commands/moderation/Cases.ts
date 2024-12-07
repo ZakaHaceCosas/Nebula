@@ -1,6 +1,5 @@
 import {
   EmbedBuilder,
-  PermissionsBitField,
   SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
@@ -39,11 +38,7 @@ export default class Cases {
     ];
 
     const guild = interaction.guild!;
-    if (
-      !guild.members.cache
-        .get(interaction.user.id)
-        ?.permissions.has(PermissionsBitField.Flags.ModerateMembers)
-    )
+    if (!guild.members.cache.get(interaction.user.id)?.permissions.has("ModerateMembers"))
       return await errorEmbed(
         interaction,
         "You can't execute this command.",

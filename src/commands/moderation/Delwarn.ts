@@ -1,7 +1,6 @@
 import {
   DMChannel,
   EmbedBuilder,
-  PermissionsBitField,
   SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
@@ -37,7 +36,7 @@ export default class Delwarn {
     const newWarns = warns.filter(warn => warn.id != `${id}`);
     if (
       await errorCheck(
-        PermissionsBitField.Flags.ModerateMembers,
+        "ModerateMembers",
         { interaction, user, action: "Remove a warning" },
         { allErrors: true, botError: false },
         "Moderate Members"

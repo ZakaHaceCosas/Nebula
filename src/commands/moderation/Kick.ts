@@ -1,8 +1,4 @@
-import {
-  PermissionsBitField,
-  SlashCommandSubcommandBuilder,
-  type ChatInputCommandInteraction
-} from "discord.js";
+import { SlashCommandSubcommandBuilder, type ChatInputCommandInteraction } from "discord.js";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
 
@@ -24,7 +20,7 @@ export default class Kick {
     const user = interaction.options.getUser("user")!;
     if (
       await errorCheck(
-        PermissionsBitField.Flags.KickMembers,
+        "KickMembers",
         { interaction, user, action: "Kick" },
         { allErrors: true, botError: true, ownerError: true, outsideError: true },
         "Kick Members"

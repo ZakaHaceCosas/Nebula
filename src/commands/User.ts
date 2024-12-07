@@ -65,7 +65,7 @@ export default class User {
     const rolesLength = memberRoles.length;
 
     if (target.premiumSinceTimestamp)
-      serverInfo.push(`Boosting since **${target.premiumSinceTimestamp}**`);
+      serverInfo.push(`Boosting since **<t:${target.premiumSinceTimestamp}:D>**`);
 
     if (memberRoles.length)
       serverInfo.push(

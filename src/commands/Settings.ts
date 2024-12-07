@@ -30,7 +30,7 @@ export default class Settings {
         .setDescription(settingsDefinition[key].description);
 
       Object.keys(settingsDefinition[key].settings).forEach(sub => {
-        switch (settingsDefinition[key].settings[sub]["type"] as string) {
+        switch (settingsDefinition[key].settings[sub].type as string) {
           case "BOOL":
             subcommand.addBooleanOption(option =>
               option
@@ -87,11 +87,7 @@ export default class Settings {
 
   async run(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
-    if (
-      !guild.members.cache
-        ?.get(interaction.user.id)
-        ?.permissions.has(PermissionsBitField.Flags.Administrator)
-    )
+    if (!guild.members.cache?.get(interaction.user.id)?.permissions.has("Administrator"))
       return await errorEmbed(
         interaction,
         "You can't execute this command.",
@@ -100,11 +96,31 @@ export default class Settings {
 
     const key = interaction.options.getSubcommand() as keyof typeof settingsDefinition;
     const values = interaction.options.data[0].options!;
+    const settingsDef = settingsDefinition[key];
+    function settingText(name: string) {
+      const setting = getSetting(guild.id, key, name)?.toString();
+      let text;
+      switch (settingsDef.settings[name].type) {
+        case "CHANNEL":
+          text = setting ? `<#${setting}>` : "Not set";
+          break;
+        case "USER":
+          text = setting ? `<@${setting}>` : "Not set";
+          break;
+        case "ROLE":
+          text = setting ? `<@&${setting}>` : "Not set";
+          break;
+        default:
+          text = setting || "Not set";
+          break;
+      }
+      return text;
+    }
+
     if (!values.length) {
-      const settingsDef = settingsDefinition[key];
       const field: string[] = [];
       Object.keys(settingsDef.settings).forEach(name =>
-        field.push(`**${name}**: ${getSetting(guild.id, key, name)?.toString() || "Not set"}`)
+        field.push(`**${name}**: ${settingText(name)}`)
       );
 
       const embed = new EmbedBuilder()
@@ -117,14 +133,27 @@ export default class Settings {
     }
 
     const embed = new EmbedBuilder()
-      .setAuthor({ name: "Parameters changed" })
+      .setAuthor({ name: "Parameters changed." })
       .setColor(genColor(100));
 
-    values.forEach(option => {
+    values.forEach(async option => {
+      if (option.type == 7)
+        if (
+          !guild.channels.cache
+            .get(option.value as string)
+            ?.permissionsFor(interaction.client.user)
+            ?.has("ViewChannel")
+        )
+          return await errorEmbed(
+            interaction,
+            "Can't view this channel.",
+            "You can either give the **View Channel** permission for Sokora or use a channel from the dropdown menu."
+          );
+
       setSetting(guild.id, key, option.name, option.value as string);
       embed.addFields({
         name: option.name,
-        value: option.value?.toString() || "Not set"
+        value: settingText(option.name.toString()!)
       });
     });
 

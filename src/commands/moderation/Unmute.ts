@@ -1,8 +1,4 @@
-import {
-  PermissionsBitField,
-  SlashCommandSubcommandBuilder,
-  type ChatInputCommandInteraction
-} from "discord.js";
+import { SlashCommandSubcommandBuilder, type ChatInputCommandInteraction } from "discord.js";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
 
@@ -22,7 +18,7 @@ export default class Unmute {
     const target = interaction.guild?.members.cache.get(user.id)!;
     if (
       await errorCheck(
-        PermissionsBitField.Flags.ModerateMembers,
+        "ModerateMembers",
         { interaction, user, action: "Unmute" },
         { allErrors: false, botError: true },
         "Moderate Members"

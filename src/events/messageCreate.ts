@@ -44,7 +44,7 @@ export default (async function run(message) {
   const difficulty = getSetting(guild.id, "leveling", "difficulty") as number;
   const [level, xp] = getLevel(guild.id, author.id);
   const newLevelData = { level: level ?? 0, xp: xp + xpGain };
-  const levelUpXp =
+  let levelUpXp =
     100 * difficulty * (newLevelData.level + 1) ** 2 - 80 * difficulty * newLevelData.level ** 2;
 
   while (
@@ -53,8 +53,8 @@ export default (async function run(message) {
   )
     newLevelData.level--;
 
-  if (newLevelData.xp < levelUpXp)
-    return setLevel(guild.id, author.id, newLevelData.level, newLevelData.xp);
+  // if (newLevelData.xp < levelUpXp)
+  //   return setLevel(guild.id, author.id, newLevelData.level, newLevelData.xp);
 
   while (
     newLevelData.xp >=
@@ -74,7 +74,7 @@ export default (async function run(message) {
       [
         `**Congratulations, ${author.displayName}**!`,
         `You made it to **level ${level + 1}**.`,
-        `You need ${100 * difficulty * (newLevelData.level + 1) ** 2 - 80 * difficulty * newLevelData.level ** 2} XP to level up again.`
+        `You need ${100 * difficulty * (newLevelData.level + 2) ** 2 - 80 * difficulty * newLevelData.level ** 2} XP to level up again.`
       ].join("\n")
     )
     .setThumbnail(author.displayAvatarURL())

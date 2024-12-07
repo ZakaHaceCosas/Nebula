@@ -1,7 +1,6 @@
 import {
   ChannelType,
   EmbedBuilder,
-  PermissionsBitField,
   SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
@@ -42,11 +41,7 @@ export default class Slowdown {
 
   async run(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
-    if (
-      !guild.members.cache
-        .get(interaction.user.id)
-        ?.permissions.has(PermissionsBitField.Flags.ManageChannels)
-    )
+    if (!guild.members.cache.get(interaction.user.id)?.permissions.has("ManageChannels"))
       return await errorEmbed(
         interaction,
         "You can't execute this command.",

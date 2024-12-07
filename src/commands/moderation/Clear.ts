@@ -1,7 +1,6 @@
 import {
   ChannelType,
   EmbedBuilder,
-  PermissionsBitField,
   SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
@@ -37,11 +36,7 @@ export default class Clear {
 
   async run(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
-    if (
-      !guild.members.cache
-        .get(interaction.user.id)
-        ?.permissions.has(PermissionsBitField.Flags.ManageMessages)
-    )
+    if (!guild.members.cache.get(interaction.user.id)?.permissions.has("ManageMessages"))
       return await errorEmbed(
         interaction,
         "You can't execute this command.",
