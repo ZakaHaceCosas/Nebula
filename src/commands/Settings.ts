@@ -97,7 +97,7 @@ export default class Settings {
     const key = interaction.options.getSubcommand() as keyof typeof settingsDefinition;
     const values = interaction.options.data[0].options!;
     const settingsDef = settingsDefinition[key];
-    function settingText(name: string) {
+    const settingText = (name: string) => {
       const setting = getSetting(guild.id, key, name)?.toString();
       let text;
       switch (settingsDef.settings[name].type) {
@@ -136,26 +136,25 @@ export default class Settings {
       .setAuthor({ name: "Parameters changed." })
       .setColor(genColor(100));
 
-    values.forEach(async option => {
-      if (option.type == 7)
-        if (
-          !guild.channels.cache
-            .get(option.value as string)
-            ?.permissionsFor(interaction.client.user)
-            ?.has("ViewChannel")
-        )
-          return await errorEmbed(
-            interaction,
-            "Can't view this channel.",
-            "You can either give the **View Channel** permission for Sokora or use a channel from the dropdown menu."
-          );
+    for (let i = 0; i < values.length; i++) {
+      const option = values[i]
+
+      if (
+        option.type == 7
+        && !guild.channels.cache.get(option.value as string)?.permissionsFor(interaction.client.user)?.has("ViewChannel")
+      )
+        return await errorEmbed(
+          interaction,
+          "Can't view this channel.",
+          "You can either give the **View Channel** permission for Sokora or use a channel from the dropdown menu."
+        );
 
       setSetting(guild.id, key, option.name, option.value as string);
       embed.addFields({
         name: option.name,
         value: settingText(option.name.toString()!)
       });
-    });
+    }
 
     await interaction.reply({ embeds: [embed] });
   }
