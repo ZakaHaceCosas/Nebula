@@ -22,7 +22,7 @@ export default class Credits {
       .setDescription(
         [
           "**Founder**: Goos",
-          "**Developers**: Dimkauzh, Froxcey, Golem64, Koslz, MQuery, Nikkerudon, Spectrum, ThatBOI",
+          "**Developers**: Dimkauzh, Froxcey, Golem64, Koslz, Littie, MQuery, Nikkerudon, Spectrum, ThatBOI",
           "**Designers**: ArtyH, ZakaHaceCosas, Pjanda",
           "**Translator Lead**: ThatBOI",
           "**Translators**: Dimkauzh, flojo, Golem64, GraczNet, Nikkerudon, ZakaHaceCosas, SaFire, TrulyBlue",

@@ -115,7 +115,7 @@ export default class Settings {
           break;
       }
       return text;
-    }
+    };
 
     if (!values.length) {
       const field: string[] = [];
@@ -137,11 +137,14 @@ export default class Settings {
       .setColor(genColor(100));
 
     for (let i = 0; i < values.length; i++) {
-      const option = values[i]
+      const option = values[i];
 
       if (
-        option.type == 7
-        && !guild.channels.cache.get(option.value as string)?.permissionsFor(interaction.client.user)?.has("ViewChannel")
+        option.type == 7 &&
+        !guild.channels.cache
+          .get(option.value as string)
+          ?.permissionsFor(interaction.client.user)
+          ?.has("ViewChannel")
       )
         return await errorEmbed(
           interaction,
