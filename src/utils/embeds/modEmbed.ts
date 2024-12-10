@@ -6,7 +6,7 @@ import {
 } from "discord.js";
 import ms from "ms";
 import { genColor } from "../colorGen";
-import { addModeration, type modType } from "../database/moderation";
+import { getModeration, addModeration, editModeration, type modType } from "../database/moderation";
 import { logChannel } from "../logChannel";
 import { errorEmbed } from "./errorEmbed";
 
@@ -18,6 +18,7 @@ type Options = {
   dm?: boolean;
   dbAction?: modType;
   expiresAt?: number;
+  previousID?: number;
 };
 
 type ErrorOptions = {
@@ -116,27 +117,45 @@ export async function modEmbed(
   reason?: string | null,
   showModerator: boolean = false
 ) {
-  const { interaction, user, action, duration, dm, dbAction, expiresAt } = options;
+  const { interaction, user, action, duration, dm, dbAction, expiresAt, previousID } = options;
   const guild = interaction.guild!;
   const name = user.displayName;
   const generalValues = [`**Moderator**: ${interaction.user.displayName}`];
-  let author = `•  ${action} ${name}`;
+  let author = `• ${previousID ? 'Edited a' : ''} ${previousID ? dbAction?.toLowerCase() : action} ${previousID ? 'on' : ''} ${name}`;
   reason ? generalValues.push(`**Reason**: ${reason}`) : generalValues.push("*No reason provided*");
   if (duration) generalValues.push(`**Duration**: ${ms(ms(duration), { long: true })}`);
-  if (dbAction)
-    try {
-      const id = addModeration(
-        guild.id,
-        user.id,
-        dbAction,
-        guild.members.cache.get(interaction.user.id)?.id!,
-        reason ?? undefined,
-        expiresAt ?? undefined
+  if (previousID) {
+    let previousCase = getModeration(guild.id, user.id, `${previousID}`);
+    if (previousCase.length && previousCase[0].user == user.id && previousCase[0].type == dbAction) {
+      try {
+        editModeration(guild.id, `${previousID}`, reason ?? '', expiresAt ?? null);
+      } catch (error) {
+        console.error(error);
+      }
+      author = author.concat(`  •  #${previousID}`);
+    } else {
+      return await errorEmbed(
+        interaction,
+        `You can't edit this ${dbAction?.toLowerCase()}.`,
+        `The ${dbAction?.toLowerCase()} doesn't exist.`
       );
-      author = author.concat(`  •  #${id}`);
-    } catch (error) {
-      console.error(error);
     }
+  } else {
+    if (dbAction)
+      try {
+        const id = addModeration(
+          guild.id,
+          user.id,
+          dbAction,
+          guild.members.cache.get(interaction.user.id)?.id!,
+          reason ?? undefined,
+          expiresAt ?? undefined
+        );
+        author = author.concat(`  •  #${id}`);
+      } catch (error) {
+        console.error(error);
+      }
+  }
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: author, iconURL: user.displayAvatarURL() })

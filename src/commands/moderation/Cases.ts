@@ -27,7 +27,8 @@ export default class Cases {
       WARN: "⚠️",
       MUTE: "🔇",
       KICK: "📤",
-      BAN: "🔨"
+      BAN: "🔨",
+      NOTE: "📝"
     };
 
     const nothingMsg = [
