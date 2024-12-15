@@ -68,6 +68,9 @@ export async function errorCheck(
   if (!allErrors) return;
   const target = members.get(user.id)!;
   const name = user.displayName;
+  const highestModPos = member.roles.highest.position;
+  const highestTargetPos = target.roles.highest.position;
+
   if (!target) return;
   if (target == member)
     return await errorEmbed(interaction, `You can't ${action.toLowerCase()} yourself.`);
@@ -79,14 +82,14 @@ export async function errorCheck(
     return await errorEmbed(
       interaction,
       `You can't ${action.toLowerCase()} ${name}.`,
-      "The member has a higher role position than Sokora."
+      "The member has a higher (or the same) role position than Sokora."
     );
 
-  if (member.roles.highest.position < target.roles.highest.position)
+  if (highestModPos <= highestTargetPos)
     return await errorEmbed(
       interaction,
       `You can't ${action.toLowerCase()} ${name}.`,
-      "The member has a higher role position than you."
+      `The member has ${highestModPos == highestTargetPos ? "the same" : "a higher"} role position ${highestModPos == highestTargetPos ? "as" : "than"} you.`
     );
 
   if (ownerError) {
@@ -121,40 +124,39 @@ export async function modEmbed(
   const guild = interaction.guild!;
   const name = user.displayName;
   const generalValues = [`**Moderator**: ${interaction.user.displayName}`];
-  let author = `• ${previousID ? 'Edited a' : ''} ${previousID ? dbAction?.toLowerCase() : action} ${previousID ? 'on' : ''} ${name}`;
+  let author = `• ${previousID ? "Edited a" : ""} ${previousID ? dbAction?.toLowerCase() : action} ${previousID ? "on" : ""} ${name}`;
   reason ? generalValues.push(`**Reason**: ${reason}`) : generalValues.push("*No reason provided*");
   if (duration) generalValues.push(`**Duration**: ${ms(ms(duration), { long: true })}`);
   if (previousID) {
     let previousCase = getModeration(guild.id, user.id, `${previousID}`);
-    if (previousCase.length && previousCase[0].user == user.id && previousCase[0].type == dbAction) {
-      try {
-        editModeration(guild.id, `${previousID}`, reason ?? '', expiresAt ?? null);
-      } catch (error) {
-        console.error(error);
-      }
-      author = author.concat(`  •  #${previousID}`);
-    } else {
+    if (!previousCase.length && previousCase[0].user != user.id && previousCase[0].type != dbAction)
       return await errorEmbed(
         interaction,
         `You can't edit this ${dbAction?.toLowerCase()}.`,
         `The ${dbAction?.toLowerCase()} doesn't exist.`
       );
+
+    try {
+      editModeration(guild.id, `${previousID}`, reason ?? "", expiresAt ?? null);
+    } catch (error) {
+      console.error(error);
     }
-  } else {
-    if (dbAction)
-      try {
-        const id = addModeration(
-          guild.id,
-          user.id,
-          dbAction,
-          guild.members.cache.get(interaction.user.id)?.id!,
-          reason ?? undefined,
-          expiresAt ?? undefined
-        );
-        author = author.concat(`  •  #${id}`);
-      } catch (error) {
-        console.error(error);
-      }
+    author = author.concat(`  •  #${previousID}`);
+  }
+
+  if (!previousID || !dbAction) return;
+  try {
+    const id = addModeration(
+      guild.id,
+      user.id,
+      dbAction,
+      guild.members.cache.get(interaction.user.id)?.id!,
+      reason ?? undefined,
+      expiresAt ?? undefined
+    );
+    author = author.concat(`  •  #${id}`);
+  } catch (error) {
+    console.error(error);
   }
 
   const embed = new EmbedBuilder()

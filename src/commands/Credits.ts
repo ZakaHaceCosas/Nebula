@@ -1,7 +1,7 @@
 import { EmbedBuilder, SlashCommandBuilder, type ChatInputCommandInteraction } from "discord.js";
 import { genColor } from "../utils/colorGen";
 import { imageColor } from "../utils/imageColor";
-import { randomise } from "../utils/randomise";
+import { replace } from "../utils/replace";
 
 export default class Credits {
   data: SlashCommandBuilder;
@@ -14,9 +14,6 @@ export default class Credits {
   async run(interaction: ChatInputCommandInteraction) {
     const user = interaction.client.user;
     const avatar = user.displayAvatarURL();
-    let emojis = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
-    if (Math.round(Math.random() * 100) <= 5) emojis = ["⌨️", "💻", "🖥️"];
-
     const embed = new EmbedBuilder()
       .setAuthor({ name: "•  Entities involved", iconURL: avatar })
       .setDescription(
@@ -29,7 +26,7 @@ export default class Credits {
           "**Testers**: Blaze, fishy, Trynera"
         ].join("\n")
       )
-      .setFooter({ text: `Made with ${randomise(emojis)} by the Sokora team` })
+      .setFooter({ text: replace("(madeWith)") })
       .setThumbnail(avatar)
       .setColor(user.hexAccentColor ?? (await imageColor(undefined, avatar)) ?? genColor(270));
 

@@ -17,18 +17,16 @@ export default (async function run(member: GuildMember) {
   const avatar = member.displayAvatarURL();
   const embed = new EmbedBuilder()
     .setAuthor({ name: `•  ${member.user.displayName} has left.`, iconURL: avatar })
+    .setDescription(
+      replace(getSetting(guildID, "welcome", "leave_text") as string, [
+        { text: "(name)", replacement: member.user.displayName },
+        { text: "(count)", replacement: member.guild.memberCount },
+        { text: "(servername)", replacement: member.guild.name }
+      ])
+    )
     .setFooter({ text: `User ID: ${member.id}` })
     .setThumbnail(avatar)
     .setColor(member.user.hexAccentColor ?? (await imageColor(undefined, avatar)) ?? genColor(200));
 
-  replace(
-    getSetting(guildID, "welcome", "leave_text") as string,
-    [
-      { text: "(name)", replacement: member.user.displayName },
-      { text: "(count)", replacement: member.guild.memberCount },
-      { text: "(servername)", replacement: member.guild.name }
-    ],
-    embed
-  );
   await channel.send({ embeds: [embed] });
 } as Event<"guildMemberRemove">);

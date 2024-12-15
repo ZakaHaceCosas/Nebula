@@ -10,7 +10,7 @@ import { version } from "../../package.json";
 import { genColor } from "../utils/colorGen";
 import { imageColor } from "../utils/imageColor";
 import { pluralOrNot } from "../utils/pluralOrNot";
-import { randomise } from "../utils/randomise";
+import { replace } from "../utils/replace";
 
 export default class About {
   data: SlashCommandBuilder;
@@ -27,8 +27,6 @@ export default class About {
     const members = guilds.map(guild => guild.memberCount).reduce((a, b) => a + b);
     const shards = client.shard?.count;
     const avatar = user.displayAvatarURL();
-    let emojis = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
-    if (Math.round(Math.random() * 100) <= 5) emojis = ["⌨️", "💻", "🖥️"];
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: "•  About Sokora", iconURL: avatar })
@@ -53,7 +51,7 @@ export default class About {
           ].join("\n")
         }
       )
-      .setFooter({ text: `Made with ${randomise(emojis)} by the Sokora team` })
+      .setFooter({ text: replace("(madeWith)") })
       .setThumbnail(avatar)
       .setColor(user.hexAccentColor ?? (await imageColor(undefined, avatar)) ?? genColor(270));
 

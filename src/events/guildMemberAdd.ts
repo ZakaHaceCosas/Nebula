@@ -27,7 +27,9 @@ export default (async function run(member) {
       .find(channel => channel.id == id)
       ?.fetch()) as TextChannel;
 
-    replace(getSetting(guildID, "welcome", "join_text") as string, replacement, embed);
+    embed.setDescription(
+      replace(getSetting(guildID, "welcome", "join_text") as string, replacement)
+    );
     await channel.send({ embeds: [embed] });
   }
 
@@ -36,7 +38,7 @@ export default (async function run(member) {
   if (!dmChannel) return;
   if (user.bot) return;
 
-  replace(getSetting(guildID, "welcome", "dm_text") as string, replacement, embed);
+  embed.setDescription(replace(getSetting(guildID, "welcome", "dm_text") as string, replacement));
   try {
     await dmChannel.send({ embeds: [embed] }).catch(() => null);
   } catch (e) {
