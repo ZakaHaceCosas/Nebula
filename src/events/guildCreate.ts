@@ -31,9 +31,6 @@ export default (async function run(guild) {
     if (welcomeChannel)
       if (welcomeChannel.permissionsFor(guild.client.user)?.has("SendMessages"))
         await welcomeChannel.send({ embeds: [embed] });
-
-    const dmChannel = (await owner.createDM().catch(() => null)) as DMChannel | undefined;
-    if (dmChannel) await dmChannel.send({ embeds: [embed] });
   } catch (e) {
     console.log(e);
   }
