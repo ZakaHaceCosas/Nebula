@@ -124,12 +124,15 @@ export async function modEmbed(
   const guild = interaction.guild!;
   const name = user.displayName;
   const generalValues = [`**Moderator**: ${interaction.user.displayName}`];
-  let author = `• ${previousID ? "Edited a" : ""} ${previousID ? dbAction?.toLowerCase() : action} ${previousID ? "on" : ""} ${name}`;
+  let author = `•  ${previousID ? "Edited a " : ""}${previousID ? dbAction?.toLowerCase() : action}${previousID ? " on" : ""} ${name}`;
   reason ? generalValues.push(`**Reason**: ${reason}`) : generalValues.push("*No reason provided*");
   if (duration) generalValues.push(`**Duration**: ${ms(ms(duration), { long: true })}`);
   if (previousID) {
     let previousCase = getModeration(guild.id, user.id, `${previousID}`);
-    if (!previousCase.length && previousCase[0].user != user.id && previousCase[0].type != dbAction)
+    if (
+      (!previousCase.length && previousCase[0].user != user.id) ||
+      previousCase[0].type != dbAction
+    )
       return await errorEmbed(
         interaction,
         `You can't edit this ${dbAction?.toLowerCase()}.`,
@@ -142,9 +145,8 @@ export async function modEmbed(
       console.error(error);
     }
     author = author.concat(`  •  #${previousID}`);
-  }
+  } else if (!dbAction) return;
 
-  if (!previousID || !dbAction) return;
   try {
     const id = addModeration(
       guild.id,
