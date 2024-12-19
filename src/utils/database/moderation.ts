@@ -29,6 +29,9 @@ const listModQuery = database.query(
   "SELECT * FROM moderation WHERE guild = $1 AND moderator = $2;"
 );
 const getIdQuery = database.query("SELECT * FROM moderation WHERE guild = $1 AND id = $2;");
+const getLastIdQuery = database.query(
+  "SELECT CAST(id AS int) AS id FROM moderation ORDER BY id DESC LIMIT 1;"
+);
 const editQuery = database.query(
   "UPDATE moderation SET reason = ?3, expiresAt = ?4 WHERE guild = ?1 AND id = ?2;"
 );
@@ -42,7 +45,8 @@ export function addModeration(
   reason = "",
   expiresAt?: number | null
 ) {
-  let id = listGuildQuery.all(guildID).length + 1;
+  let id: any = getLastIdQuery.all(guildID);
+  id = parseInt(id.length ? id[0].id : 0) + 1;
   addQuery.run(guildID, userID, type, moderator, reason, id, Date.now(), expiresAt ?? null);
   return id;
 }

@@ -16,11 +16,12 @@ export default (async function run(message) {
       name: `•  ${author.displayName}'s message has been deleted.`,
       iconURL: author.displayAvatarURL()
     })
+    .setDescription(`[Jump to message](${message.url})`)
     .addFields({
       name: "🗑️ • Deleted message",
       value: message.content!
     })
-    .setFooter({ text: `Message ID: ${message.id}\nUser ID: ${author.id}` })
+    .setFooter({ text: `User ID: ${author.id}` })
     .setColor(genColor(0));
 
   await logChannel(guild, embed);
