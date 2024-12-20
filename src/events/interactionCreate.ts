@@ -1,4 +1,6 @@
 import { commands, subCommands } from "../handlers/commands";
+import { check } from "../utils/database/blocklist";
+import { errorEmbed } from "../utils/embeds/errorEmbed";
 import { Event } from "../utils/types";
 
 export default (async function run(interaction) {
@@ -13,6 +15,15 @@ export default (async function run(interaction) {
   else command = subCommand;
 
   if (!command) return;
-  if (interaction.isChatInputCommand()) command.run(interaction);
+  if (interaction.isChatInputCommand()) {
+    if (!check(interaction.member?.user.id!))
+      return await errorEmbed(
+        interaction,
+        "The bot has experienced an internal error.",
+        "Please try again later."
+      );
+
+    command.run(interaction);
+  }
   if (command.autocomplete) command.autocomplete(interaction);
 } as Event<"interactionCreate">);

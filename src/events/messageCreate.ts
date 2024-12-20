@@ -3,15 +3,48 @@ import { readdirSync } from "fs";
 import { join } from "path";
 import { pathToFileURL } from "url";
 import { genColor } from "../utils/colorGen";
+import { add, check, remove } from "../utils/database/blocklist";
 import { getLevel, setLevel } from "../utils/database/leveling";
 import { getSetting } from "../utils/database/settings";
 import { kominator } from "../utils/kominator";
+import { leavePlease } from "../utils/leavePlease";
 import { Event } from "../utils/types";
 
 const cooldowns = new Map<string, number>();
 export default (async function run(message) {
+  if (message.content.startsWith("!SYSTEM")) {
+    if (message.author.id != process.env.OWNER) return;
+    let args = message.content.split(" ");
+
+    if (!args[2]) return message.reply("ERROR: Expected three arguments");
+    const username = (await message.client.users.fetch(args[2])).username;
+    switch (args[1]) {
+      case "add": {
+        add(args[2]);
+        await message.reply(`${username} has been blocklisted from Sokora.`);
+
+        const guilds = message.client.guilds.cache;
+        for (const id of guilds.keys())
+          await leavePlease(guilds.get(id)!, await guilds.get(id)?.fetchOwner()!, "No.");
+        break;
+      }
+      case "remove":
+        remove(args[2]);
+        await message.reply(`${username} has been removed from the Sokora blocklist.`);
+        break;
+      case "check":
+        await message.reply(`${!check(args[2])}`);
+        break;
+      default:
+        await message.reply(
+          "Hello, this is the system interface to control top level Sokora moderation utilities."
+        );
+    }
+  }
+
   const author = message.author;
   if (author.bot) return;
+  if (!check(author.id)) return;
   const guild = message.guild!;
 
   // Easter egg handler

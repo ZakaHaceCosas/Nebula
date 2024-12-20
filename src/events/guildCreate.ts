@@ -1,12 +1,14 @@
-import { EmbedBuilder, type DMChannel } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { commands } from "../handlers/commands";
 import { genColor } from "../utils/colorGen";
+import { check } from "../utils/database/blocklist";
+import { leavePlease } from "../utils/leavePlease";
 import { replace } from "../utils/replace";
 import { Event } from "../utils/types";
 
 export default (async function run(guild) {
   const owner = await guild.fetchOwner();
-  if (owner.user.bot) return;
+  if (!check(owner.id)) return await leavePlease(guild, owner, "No.");
 
   const client = guild.client;
   const embed = new EmbedBuilder()
