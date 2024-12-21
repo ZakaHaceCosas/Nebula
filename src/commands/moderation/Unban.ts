@@ -1,9 +1,4 @@
-import {
-  PermissionsBitField,
-  SlashCommandSubcommandBuilder,
-  type ChatInputCommandInteraction
-} from "discord.js";
-import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { SlashCommandSubcommandBuilder, type ChatInputCommandInteraction } from "discord.js";
 import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
 
 export default class Unban {
@@ -31,22 +26,15 @@ export default class Unban {
 
     if (
       await errorCheck(
-        PermissionsBitField.Flags.BanMembers,
+        "BanMembers",
         { interaction, user: target, action: "Unban" },
-        { allErrors: false, botError: true, ownerError: true },
+        { allErrors: false, botError: true, ownerError: true, unbanError: true },
         "Ban Members"
       )
     )
       return;
 
-    if (!target)
-      return await errorEmbed(
-        interaction,
-        "You can't unban this user.",
-        "The user was never banned."
-      );
-
-    await guild.members.unban(id, reason ?? undefined).catch(error => console.error(error));
     await modEmbed({ interaction, user: target, action: "Unbanned" }, reason);
+    await guild.members.unban(id, reason ?? undefined).catch(error => console.error(error));
   }
 }

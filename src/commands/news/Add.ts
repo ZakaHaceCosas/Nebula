@@ -2,7 +2,6 @@ import {
   ActionRowBuilder,
   EmbedBuilder,
   ModalBuilder,
-  PermissionsBitField,
   SlashCommandSubcommandBuilder,
   TextInputBuilder,
   TextInputStyle,
@@ -21,11 +20,7 @@ export default class Add {
 
   async run(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
-    if (
-      !guild.members.cache
-        .get(interaction.user.id)
-        ?.permissions.has(PermissionsBitField.Flags.ManageGuild)
-    )
+    if (!guild.members.cache.get(interaction.user.id)?.permissions.has("ManageGuild"))
       return await errorEmbed(
         interaction,
         "You can't execute this command.",

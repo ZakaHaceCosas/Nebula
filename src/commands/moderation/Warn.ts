@@ -1,8 +1,4 @@
-import {
-  PermissionsBitField,
-  SlashCommandSubcommandBuilder,
-  type ChatInputCommandInteraction
-} from "discord.js";
+import { SlashCommandSubcommandBuilder, type ChatInputCommandInteraction } from "discord.js";
 import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
 
 export default class Warn {
@@ -32,7 +28,7 @@ export default class Warn {
     const showModerator = interaction.options.getBoolean("show_moderator") ?? false;
     if (
       await errorCheck(
-        PermissionsBitField.Flags.ModerateMembers,
+        "ModerateMembers",
         { interaction, user, action: "Warn" },
         { allErrors: true, botError: false, ownerError: true, outsideError: true },
         "Moderate Members"

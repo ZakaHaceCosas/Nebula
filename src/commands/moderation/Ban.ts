@@ -1,8 +1,4 @@
-import {
-  PermissionsBitField,
-  SlashCommandSubcommandBuilder,
-  type ChatInputCommandInteraction
-} from "discord.js";
+import { SlashCommandSubcommandBuilder, type ChatInputCommandInteraction } from "discord.js";
 import ms from "ms";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
@@ -30,7 +26,7 @@ export default class Ban {
     const reason = interaction.options.getString("reason");
     if (
       await errorCheck(
-        PermissionsBitField.Flags.BanMembers,
+        "BanMembers",
         { interaction, user, action: "Ban" },
         { allErrors: true, botError: true, ownerError: true },
         "Ban Members"
@@ -60,14 +56,13 @@ export default class Ban {
     }
 
     try {
+      await modEmbed(
+        { interaction, user, action: "Banned", duration, dm: true, dbAction: "BAN", expiresAt },
+        reason
+      );
       await guild.members.ban(user.id, { reason: reason ?? undefined });
     } catch (err) {
       console.error("Failed to ban user:", err);
     }
-
-    await modEmbed(
-      { interaction, user, action: "Banned", duration, dm: true, dbAction: "BAN", expiresAt },
-      reason
-    );
   }
 }

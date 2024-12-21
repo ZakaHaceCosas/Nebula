@@ -1,7 +1,6 @@
 import {
   ChannelType,
   EmbedBuilder,
-  PermissionsBitField,
   SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
@@ -30,11 +29,7 @@ export default class Unlock {
 
   async run(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
-    if (
-      !guild.members.cache
-        .get(interaction.user.id)
-        ?.permissions.has(PermissionsBitField.Flags.ManageRoles)
-    )
+    if (!guild.members.cache.get(interaction.user.id)?.permissions.has("ManageRoles"))
       return await errorEmbed(
         interaction,
         "You can't execute this command.",

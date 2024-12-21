@@ -1,6 +1,7 @@
 import { ActivityType, Client } from "discord.js";
-import { Commands } from "./handlers/commands";
-import { Events } from "./handlers/events";
+import { registerCommands } from "./handlers/commands";
+import { loadEvents } from "./handlers/events";
+import { leavePlease } from "./utils/leavePlease";
 import { rescheduleUnbans } from "./utils/unbanScheduler";
 
 const client = new Client({
@@ -12,15 +13,18 @@ const client = new Client({
     "GuildMembers",
     "GuildMessages",
     "GuildEmojisAndStickers",
-    "GuildPresences",
     "GuildBans",
     "MessageContent"
   ]
 });
 
 client.on("ready", async () => {
-  await new Events(client).loadEvents();
-  await new Commands(client).registerCommands();
+  const guilds = client.guilds.cache;
+  for (const id of guilds.keys())
+    await leavePlease(guilds.get(id)!, await guilds.get(id)?.fetchOwner()!, "Not like that.");
+
+  await loadEvents(client);
+  await registerCommands(client);
   console.log("ちーっす！");
   rescheduleUnbans(client);
 });

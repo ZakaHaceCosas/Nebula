@@ -1,7 +1,6 @@
 import {
   ChannelType,
   EmbedBuilder,
-  PermissionsBitField,
   SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
@@ -42,11 +41,7 @@ export default class Slowdown {
 
   async run(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
-    if (
-      !guild.members.cache
-        .get(interaction.user.id)
-        ?.permissions.has(PermissionsBitField.Flags.ManageChannels)
-    )
+    if (!guild.members.cache.get(interaction.user.id)?.permissions.has("ManageChannels"))
       return await errorEmbed(
         interaction,
         "You can't execute this command.",
@@ -57,10 +52,10 @@ export default class Slowdown {
     const reason = interaction.options.getString("reason");
     const channelOption = interaction.options.getChannel("channel")!;
     const channel = guild.channels.cache.get(interaction.channel?.id ?? channelOption.id)!;
-    let title = `Set a slowdown of \`${channelOption ?? `${channel.name}`}\` to ${ms(ms(time), {
+    let title = `Set a slowdown of ${channelOption ?? `${channel.name}`} to ${ms(ms(time), {
       long: true
     })}.`;
-    if (!ms(time)) title = `Removed the slowdown from \`${channelOption ?? `${channel.name}`}\`.`;
+    if (!ms(time)) title = `Removed the slowdown from ${channelOption ?? `${channel.name}`}.`;
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: title })
@@ -68,7 +63,7 @@ export default class Slowdown {
         [
           `**Moderator**: ${interaction.user.displayName}`,
           reason ? `**Reason**: ${reason}` : "*No reason provided*",
-          `**Channel**: ${channelOption ?? `<#${channel.id}>**`}`
+          `**Channel**: ${channelOption ?? `<#${channel.id}>`}`
         ].join("\n")
       )
       .setColor(genColor(100));

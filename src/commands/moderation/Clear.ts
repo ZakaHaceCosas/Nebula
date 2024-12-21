@@ -1,13 +1,13 @@
 import {
   ChannelType,
   EmbedBuilder,
-  PermissionsBitField,
   SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { logChannel } from "../../utils/logChannel";
+import { pluralOrNot } from "../../utils/pluralOrNot";
 
 export default class Clear {
   data: SlashCommandSubcommandBuilder;
@@ -36,11 +36,7 @@ export default class Clear {
 
   async run(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
-    if (
-      !guild.members.cache
-        .get(interaction.user.id)
-        ?.permissions.has(PermissionsBitField.Flags.ManageMessages)
-    )
+    if (!guild.members.cache.get(interaction.user.id)?.permissions.has("ManageMessages"))
       return await errorEmbed(
         interaction,
         "You can't execute this command.",
@@ -56,7 +52,7 @@ export default class Clear {
     const channelOption = interaction.options.getChannel("channel")!;
     const channel = guild.channels.cache.get(interaction.channel?.id ?? channelOption.id)!;
     const embed = new EmbedBuilder()
-      .setAuthor({ name: `Cleared ${amount} message${amount == 1 ? "" : "s"}.` })
+      .setAuthor({ name: `Cleared ${amount} ${pluralOrNot("message", amount)}.` })
       .setDescription(
         [
           `**Moderator**: ${interaction.user.displayName}`,
@@ -73,7 +69,7 @@ export default class Clear {
     )
       try {
         channel == interaction.channel
-          ? await channel.bulkDelete(amount + 1, true)
+          ? await channel.bulkDelete(amount, true)
           : await channel.bulkDelete(amount, true);
       } catch (error) {
         console.error(error);

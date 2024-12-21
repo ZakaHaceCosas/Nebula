@@ -1,16 +1,14 @@
-import { EmbedBuilder, type DMChannel } from "discord.js";
-import { Commands } from "../handlers/commands";
+import { EmbedBuilder } from "discord.js";
+import { commands } from "../handlers/commands";
 import { genColor } from "../utils/colorGen";
-import { randomise } from "../utils/randomise";
+import { check } from "../utils/database/blocklist";
+import { leavePlease } from "../utils/leavePlease";
+import { replace } from "../utils/replace";
 import { Event } from "../utils/types";
 
 export default (async function run(guild) {
-  const dmChannel = (await (await guild.fetchOwner()).createDM().catch(() => null)) as
-    | DMChannel
-    | undefined;
-
-  let emojis = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
-  if (Math.round(Math.random() * 100) <= 5) emojis = ["⌨️", "💻", "🖥️"];
+  const owner = await guild.fetchOwner();
+  if (!check(owner.id)) return await leavePlease(guild, owner, "No.");
 
   const client = guild.client;
   const embed = new EmbedBuilder()
@@ -25,10 +23,17 @@ export default (async function run(guild) {
         "Sokora is in an early stage of development. If you find bugs, please go to our [official server](https://discord.gg/c6C25P4BuY) and report them."
       ].join("\n")
     )
-    .setFooter({ text: `Made with ${randomise(emojis)} by the Sokora team` })
+    .setFooter({ text: replace("(madeWith)") })
     .setThumbnail(client.user.displayAvatarURL())
     .setColor(genColor(200));
 
-  await new Commands(client).registerCommandsForGuild(guild);
-  if (dmChannel) await dmChannel.send({ embeds: [embed] });
+  await guild.commands.set(commands.map(command => command.data));
+  try {
+    const welcomeChannel = guild.systemChannel;
+    if (welcomeChannel)
+      if (welcomeChannel.permissionsFor(guild.client.user)?.has("SendMessages"))
+        await welcomeChannel.send({ embeds: [embed] });
+  } catch (e) {
+    console.log(e);
+  }
 } as Event<"guildCreate">);

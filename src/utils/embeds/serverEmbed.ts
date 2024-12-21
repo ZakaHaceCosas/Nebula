@@ -7,6 +7,7 @@
 import { EmbedBuilder, type Guild } from "discord.js";
 import { genColor } from "../colorGen";
 import { imageColor } from "../imageColor";
+import { pluralOrNot } from "../pluralOrNot";
 
 type Options = {
   guild: Guild;
@@ -20,9 +21,6 @@ export async function serverEmbed(options: Options) {
   const { premiumTier: boostTier, premiumSubscriptionCount: boostCount } = guild;
   const members = guild.members.cache;
   const boosters = members.filter(member => member.premiumSince);
-  const onlineMembers = members.filter(member =>
-    ["online", "dnd", "idle"].includes(member.presence?.status!)
-  ).size;
   const bots = members.filter(member => member.user.bot);
   const formattedUserCount = (guild.memberCount - bots.size)?.toLocaleString("en-US");
   const icon = guild.iconURL()!;
@@ -58,7 +56,7 @@ export async function serverEmbed(options: Options) {
 
   if (options.roles)
     embed.addFields({
-      name: `🎭 • ${roles.size - 1} ${roles.size == 1 ? "role" : "roles"}`,
+      name: `🎭 • ${roles.size - 1} ${pluralOrNot("role", roles.size - 1)}`,
       value:
         roles.size == 1
           ? "*None*"
@@ -72,16 +70,16 @@ export async function serverEmbed(options: Options) {
     {
       name: `👥 • ${guild.memberCount?.toLocaleString("en-US")} members`,
       value: [
-        `**${formattedUserCount}** users • **${bots.size?.toLocaleString("en-US")}** bots`,
-        `**${onlineMembers?.toLocaleString("en-US")}** online`
+        `**${formattedUserCount}** ${pluralOrNot("user", guild.memberCount - bots.size)}`,
+        `**${bots.size?.toLocaleString("en-US")}** ${pluralOrNot("bot", bots.size)}`
       ].join("\n"),
       inline: true
     },
     {
-      name: `🗨️ • ${channelSizes.text + channelSizes.voice} channels`,
+      name: `🗨️ • ${channelSizes.text + channelSizes.voice} ${pluralOrNot("channel", channelSizes.text + channelSizes.voice)}`,
       value: [
         `**${channelSizes.text}** text • **${channelSizes.voice}** voice`,
-        `**${channelSizes.categories}** categories`
+        `**${channelSizes.categories}** ${pluralOrNot("category", channelSizes.categories)}`
       ].join("\n"),
       inline: true
     },
@@ -90,8 +88,8 @@ export async function serverEmbed(options: Options) {
       value: [
         `**${boostCount}**${
           !boostTier ? "/2" : boostTier == 1 ? "/7" : boostTier == 2 ? "/14" : ""
-        } boosts`,
-        `**${boosters.size}** ${boosters.size == 1 ? "booster" : "boosters"}`
+        } ${pluralOrNot("boost", boostCount!)}`,
+        `**${boosters.size}** ${pluralOrNot("booster", boosters.size)}`
       ].join("\n"),
       inline: true
     }

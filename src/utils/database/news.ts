@@ -21,8 +21,8 @@ const sendQuery = database.query(
   "INSERT INTO news (guildID, title, body, author, authorPFP, createdAt, updatedAt, messageID, id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9);"
 );
 export const listAllQuery = database.query("SELECT * FROM news WHERE guildID = $1;");
-const getIdQuery = database.query("SELECT * FROM news WHERE id = $1;");
-const deleteQuery = database.query("DELETE FROM news WHERE id = $1");
+const getIdQuery = database.query("SELECT * FROM news WHERE guildID = $1 AND id = $2;");
+const deleteQuery = database.query("DELETE FROM news WHERE guildID = $1 AND id = $2;");
 
 export function addNews(
   guildID: string,
@@ -40,13 +40,13 @@ export function listAllNews(guildID: string) {
   return listAllQuery.all(guildID) as TypeOfDefinition<typeof definition>[];
 }
 
-export function get(id: string) {
-  return getIdQuery.get(id) as TypeOfDefinition<typeof definition> | null;
+export function get(guildID: string, id: string) {
+  return getIdQuery.get(guildID, id) as TypeOfDefinition<typeof definition> | null;
 }
 
-export function updateNews(id: string, title?: string, body?: string, messageID?: string) {
-  const lastElem = get(id)!;
-  deleteQuery.run(id);
+export function updateNews(guildID: string, id: string, title?: string, body?: string, messageID?: string) {
+  const lastElem = get(guildID, id)!;
+  deleteQuery.run(guildID, id);
   sendQuery.run(
     lastElem.guildID,
     title ?? lastElem.title,
@@ -60,6 +60,6 @@ export function updateNews(id: string, title?: string, body?: string, messageID?
   );
 }
 
-export function deleteNews(id: string) {
-  deleteQuery.run(id);
+export function deleteNews(guildID: string, id: string) {
+  deleteQuery.run(guildID, id);
 }

@@ -3,15 +3,48 @@ import { readdirSync } from "fs";
 import { join } from "path";
 import { pathToFileURL } from "url";
 import { genColor } from "../utils/colorGen";
+import { add, check, remove } from "../utils/database/blocklist";
 import { getLevel, setLevel } from "../utils/database/leveling";
 import { getSetting } from "../utils/database/settings";
 import { kominator } from "../utils/kominator";
+import { leavePlease } from "../utils/leavePlease";
 import { Event } from "../utils/types";
 
 const cooldowns = new Map<string, number>();
 export default (async function run(message) {
+  if (message.content.startsWith("!SYSTEM")) {
+    if (message.author.id != process.env.OWNER) return;
+    let args = message.content.split(" ");
+
+    if (!args[2]) return message.reply("ERROR: Expected three arguments");
+    const username = (await message.client.users.fetch(args[2])).username;
+    switch (args[1]) {
+      case "add": {
+        add(args[2]);
+        await message.reply(`${username} has been blocklisted from Sokora.`);
+
+        const guilds = message.client.guilds.cache;
+        for (const id of guilds.keys())
+          await leavePlease(guilds.get(id)!, await guilds.get(id)?.fetchOwner()!, "No.");
+        break;
+      }
+      case "remove":
+        remove(args[2]);
+        await message.reply(`${username} has been removed from the Sokora blocklist.`);
+        break;
+      case "check":
+        await message.reply(`${!check(args[2])}`);
+        break;
+      default:
+        await message.reply(
+          "Hello, this is the system interface to control top level Sokora moderation utilities."
+        );
+    }
+  }
+
   const author = message.author;
   if (author.bot) return;
+  if (!check(author.id)) return;
   const guild = message.guild!;
 
   // Easter egg handler
@@ -43,21 +76,22 @@ export default (async function run(message) {
   const levelChannelId = getSetting(guild.id, "leveling", "channel");
   const difficulty = getSetting(guild.id, "leveling", "difficulty") as number;
   const [level, xp] = getLevel(guild.id, author.id);
-  const xpUntilLevelUp = Math.floor(
-    100 * difficulty * (level + 1) ** 2 - 85 * difficulty * level ** 2
-  );
   const newLevelData = { level: level ?? 0, xp: xp + xpGain };
 
-  if (newLevelData.xp < xpUntilLevelUp)
-    return setLevel(guild.id, author.id, newLevelData.level, newLevelData.xp);
+  while (
+    newLevelData.xp <
+    100 * difficulty * (newLevelData.level + 1) ** 2 - 80 * difficulty * newLevelData.level ** 2
+  )
+    newLevelData.level--;
 
   while (
     newLevelData.xp >=
-    100 * difficulty * (newLevelData.level + 1) ** 2 - 85 * difficulty * newLevelData.level ** 2
+    100 * difficulty * (newLevelData.level + 1) ** 2 - 80 * difficulty * newLevelData.level ** 2
   )
     newLevelData.level++;
 
   setLevel(guild.id, author.id, newLevelData.level, newLevelData.xp);
+  if (newLevelData.level == level || newLevelData.level < level) return;
   const embed = new EmbedBuilder()
     .setAuthor({
       name: `•  ${author.displayName} has levelled up!`,
@@ -66,8 +100,8 @@ export default (async function run(message) {
     .setDescription(
       [
         `**Congratulations, ${author.displayName}**!`,
-        `You made it to **level ${level + 1}**`,
-        `You need ${Math.floor(100 * difficulty * (level + 2))} XP to level up again.`
+        `You made it to **level ${newLevelData.level}**.`,
+        `You need ${100 * difficulty * (newLevelData.level + 1) ** 2 - 80 * difficulty * newLevelData.level ** 2} XP to level up again.`
       ].join("\n")
     )
     .setThumbnail(author.displayAvatarURL())

@@ -2,7 +2,6 @@ import {
   ActionRowBuilder,
   EmbedBuilder,
   ModalBuilder,
-  PermissionsBitField,
   SlashCommandSubcommandBuilder,
   TextInputBuilder,
   TextInputStyle,
@@ -32,11 +31,7 @@ export default class Edit {
 
   async run(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
-    if (
-      !guild.members.cache
-        .get(interaction.user.id)
-        ?.permissions.has(PermissionsBitField.Flags.ManageGuild)
-    )
+    if (!guild.members.cache.get(interaction.user.id)?.permissions.has("ManageGuild"))
       return await errorEmbed(
         interaction,
         "You can't execute this command.",
@@ -44,7 +39,7 @@ export default class Edit {
       );
 
     const id = interaction.options.getString("id")!;
-    const news = get(id);
+    const news = get(guild.id, id);
     if (!news) return await errorEmbed(interaction, "The specified news don't exist.");
 
     const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -102,8 +97,8 @@ export default class Edit {
         content: roleToSend ? `<@&${roleToSend.id}>` : undefined
       });
 
-      updateNews(id, title, body);
-      await interaction.reply({
+      updateNews(guild.id, id, title, body);
+      await i.reply({
         embeds: [new EmbedBuilder().setTitle("News edited.").setColor(genColor(100))],
         ephemeral: true
       });

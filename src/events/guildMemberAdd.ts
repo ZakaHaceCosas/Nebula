@@ -10,8 +10,14 @@ export default (async function run(member) {
   const id = getSetting(guildID, "welcome", "channel") as string;
   const user = member.user;
   const avatar = member.displayAvatarURL();
-  const embed = new EmbedBuilder()
-    .setAuthor({ name: `•  ${user.displayName} has joined`, iconURL: avatar })
+  const replacement = [
+    { text: "(name)", replacement: user.displayName },
+    { text: "(count)", replacement: member.guild.memberCount },
+    { text: "(servername)", replacement: member.guild.name }
+  ];
+
+  let embed = new EmbedBuilder()
+    .setAuthor({ name: `•  ${user.displayName} has joined.`, iconURL: avatar })
     .setFooter({ text: `User ID: ${member.id}` })
     .setThumbnail(avatar)
     .setColor(member.user.hexAccentColor ?? (await imageColor(undefined, avatar)) ?? genColor(200));
@@ -21,7 +27,9 @@ export default (async function run(member) {
       .find(channel => channel.id == id)
       ?.fetch()) as TextChannel;
 
-    replace(member, getSetting(guildID, "welcome", "join_text") as string, embed);
+    embed.setDescription(
+      replace(getSetting(guildID, "welcome", "join_text") as string, replacement)
+    );
     await channel.send({ embeds: [embed] });
   }
 
@@ -30,6 +38,10 @@ export default (async function run(member) {
   if (!dmChannel) return;
   if (user.bot) return;
 
-  replace(member, getSetting(guildID, "welcome", "dm_text") as string, embed);
-  await dmChannel.send({ embeds: [embed] }).catch(() => null);
+  embed.setDescription(replace(getSetting(guildID, "welcome", "dm_text") as string, replacement));
+  try {
+    await dmChannel.send({ embeds: [embed] }).catch(() => null);
+  } catch (e) {
+    return console.log(e);
+  }
 } as Event<"guildMemberAdd">);

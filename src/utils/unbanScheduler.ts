@@ -20,7 +20,7 @@ export function scheduleUnban(
       const user = guild.bans.cache.get(userID)?.user!;
       const moderator = guild.members.cache.get(modID)!;
       const embed = new EmbedBuilder()
-        .setAuthor({ name: `•  Unbanned ${user.displayName}`, iconURL: user.displayAvatarURL() })
+        .setAuthor({ name: `•  Unbanned ${user.displayName}.`, iconURL: user.displayAvatarURL() })
         .setDescription(
           [`**Moderator**: ${moderator.displayName}`, "*Temporary ban has expired*"].join("\n")
         )

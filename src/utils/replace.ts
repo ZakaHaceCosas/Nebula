@@ -1,10 +1,15 @@
-import type { GuildMember, EmbedBuilder } from "discord.js";
+import { randomise } from "./randomise";
 
-export function replace(member: GuildMember, text: string, embed: EmbedBuilder) {
-  const user = member.user;
-  const guild = member.guild;
-  if (text?.includes("(name)")) text = text.replaceAll("(name)", user.displayName);
-  if (text?.includes("(count)")) text = text.replaceAll("(count)", `${guild.memberCount}`);
-  if (text?.includes("(servername)")) text = text.replaceAll("(servername)", `${guild.name}`);
-  embed.setDescription(text);
+let emojis = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
+if (Math.round(Math.random() * 100) <= 5) emojis = ["⌨️", "💻", "🖥️"];
+
+export const replacements = [
+  { text: "(madeWith)", replacement: `Made with ${randomise(emojis)} by the Sokora team` }
+];
+
+export function replace(text: string, replaceText?: { text: string; replacement: any }[]) {
+  for (const mention of replaceText ? replaceText || replacements : replacements)
+    if (text?.includes(mention.text)) text = text.replaceAll(mention.text, mention.replacement);
+
+  return text;
 }

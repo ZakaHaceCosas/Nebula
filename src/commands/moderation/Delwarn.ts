@@ -1,7 +1,6 @@
 import {
   DMChannel,
   EmbedBuilder,
-  PermissionsBitField,
   SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
@@ -37,8 +36,8 @@ export default class Delwarn {
     const newWarns = warns.filter(warn => warn.id != `${id}`);
     if (
       await errorCheck(
-        PermissionsBitField.Flags.ModerateMembers,
-        { interaction, user, action: "Remove a warn" },
+        "ModerateMembers",
+        { interaction, user, action: "Remove a warning" },
         { allErrors: true, botError: false },
         "Moderate Members"
       )
@@ -46,7 +45,7 @@ export default class Delwarn {
       return;
 
     if (newWarns.length == warns.length)
-      return await errorEmbed(interaction, `There is no warn with the id of ${id}.`);
+      return await errorEmbed(interaction, `There is no warning with the id of ${id}.`);
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: `•  Removed a warning from ${name}`, iconURL: user.displayAvatarURL() })
@@ -65,6 +64,10 @@ export default class Delwarn {
     const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
     if (!dmChannel) return;
     if (user.bot) return;
-    await dmChannel.send({ embeds: [embed.setTitle("Your warning has been removed.")] });
+    try {
+      await dmChannel.send({ embeds: [embed.setTitle("Your warning has been removed.")] });
+    } catch (e) {
+      console.log(e);
+    }
   }
 }

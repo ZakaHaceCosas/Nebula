@@ -1,4 +1,13 @@
-export type FieldData = "TEXT" | "INTEGER" | "BOOL" | "TIMESTAMP" | "LIST";
+export type FieldData =
+  | "TEXT"
+  | "INTEGER"
+  | "BOOL"
+  | "TIMESTAMP"
+  | "CHANNEL"
+  | "USER"
+  | "ROLE"
+  | "COMMAND"
+  | "LIST";
 
 export type TableDefinition = {
   name: string;
@@ -10,6 +19,10 @@ export type SqlType<T extends FieldData> = {
   INTEGER: number;
   TEXT: string;
   TIMESTAMP: Date;
+  CHANNEL: string;
+  USER: string;
+  ROLE: string;
+  COMMAND: string;
   LIST: any[];
 }[T];
 

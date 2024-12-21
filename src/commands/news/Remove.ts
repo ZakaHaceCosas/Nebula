@@ -1,6 +1,5 @@
 import {
   EmbedBuilder,
-  PermissionsBitField,
   SlashCommandSubcommandBuilder,
   TextChannel,
   type ChatInputCommandInteraction
@@ -26,11 +25,7 @@ export default class Remove {
 
   async run(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
-    if (
-      !guild.members.cache
-        .get(interaction.user.id)
-        ?.permissions.has(PermissionsBitField.Flags.ManageGuild)
-    )
+    if (!guild.members.cache.get(interaction.user.id)?.permissions.has("ManageGuild"))
       return await errorEmbed(
         interaction,
         "You can't execute this command.",
@@ -38,7 +33,7 @@ export default class Remove {
       );
 
     const id = interaction.options.getString("id")!;
-    const news = get(id);
+    const news = get(guild.id, id);
     if (!news) return await errorEmbed(interaction, "The specified news don't exist.");
 
     const newsChannel = (await guild.channels
@@ -46,7 +41,7 @@ export default class Remove {
       .catch(() => null)) as TextChannel;
 
     if (newsChannel) await newsChannel.messages.delete(news.messageID);
-    deleteNews(id);
+    deleteNews(guild.id, id);
     await interaction.reply({
       embeds: [new EmbedBuilder().setTitle("News removed.").setColor(genColor(100))],
       ephemeral: true

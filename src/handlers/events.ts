@@ -3,24 +3,17 @@ import { readdirSync } from "fs";
 import { join } from "path";
 import { pathToFileURL } from "url";
 
-export class Events {
-  client: Client;
-  events: any[] = [];
-  constructor(client: Client) {
-    this.client = client;
-  }
+let events = [];
+export async function loadEvents(client: Client) {
+  const eventsPath = join(process.cwd(), "src", "events");
 
-  async loadEvents() {
-    const eventsPath = join(process.cwd(), "src", "events");
+  for (const eventFile of readdirSync(eventsPath)) {
+    if (!eventFile.endsWith("ts")) continue;
 
-    for (const eventFile of readdirSync(eventsPath)) {
-      if (!eventFile.endsWith("ts")) continue;
+    const event = (await import(pathToFileURL(join(eventsPath, eventFile)).toString())).default;
+    const eventName = eventFile.split(".ts")[0];
+    const clientEvent = client.on(eventName, event);
 
-      const event = (await import(pathToFileURL(join(eventsPath, eventFile)).toString())).default;
-      const eventName = eventFile.split(".ts")[0];
-      const clientEvent = this.client.on(eventName, event);
-
-      this.events.push({ name: eventName, event: clientEvent });
-    }
+    events.push({ name: eventName, event: clientEvent });
   }
 }
