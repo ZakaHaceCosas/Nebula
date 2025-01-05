@@ -26,6 +26,7 @@ export default class Cases {
     const actionsEmojis: { [key: string]: string } = {
       WARN: "⚠️",
       MUTE: "🔇",
+      UNMUTE: "🔊",
       KICK: "📤",
       BAN: "🔨",
       NOTE: "📝"

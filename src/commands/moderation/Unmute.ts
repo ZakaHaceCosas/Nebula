@@ -10,12 +10,17 @@ export default class Unmute {
       .setDescription("Unmutes a user.")
       .addUserOption(user =>
         user.setName("user").setDescription("The user that you want to unmute.").setRequired(true)
+      )
+      .addStringOption(reason =>
+        reason.setName("reason").setDescription("The reason for unmuting the user.")
       );
   }
 
   async run(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("user")!;
-    const target = interaction.guild?.members.cache.get(user.id)!;
+    const target = interaction.guild?.members.cache.get(user.id);
+    const reason = interaction.options.getString("reason");
+    
     if (
       await errorCheck(
         "ModerateMembers",
@@ -26,14 +31,14 @@ export default class Unmute {
     )
       return;
 
-    if (!target.communicationDisabledUntil)
+    if (!target?.communicationDisabledUntil)
       return await errorEmbed(
         interaction,
         "You can't unmute this user.",
         "The user was never muted."
       );
 
-    await modEmbed({ interaction, user, action: "Unmuted" });
-    await target.edit({ communicationDisabledUntil: null }).catch(error => console.error(error));
+    await modEmbed({ interaction, user, action: "Unmuted", dm: true, dbAction: "UNMUTE" }, reason);
+    await target?.edit({ communicationDisabledUntil: null }).catch(error => console.error(error));
   }
 }
