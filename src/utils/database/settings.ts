@@ -48,6 +48,21 @@ export const settingsDefinition: Record<
         type: "INTEGER",
         desc: "Set the difficulty (ex: 2 will make it 2x harder to level up).",
         val: 1
+      },
+      rewards: {
+        type: "TEXT",
+        desc: "Role rewards for levels (format: roleID:level,roleID:level)",
+        val: ""
+      },
+      multipliers: {
+        type: "TEXT",
+        desc: "XP multipliers for roles/channels (format: multiplier:ID1,ID2)",
+        val: ""
+      },
+      xp_per_chars: {
+        type: "TEXT",
+        desc: "XP per character count (format: xp:chars)",
+        val: "1:100"
       }
     }
   },
@@ -62,6 +77,45 @@ export const settingsDefinition: Record<
         type: "BOOL",
         desc: "Whether or not edited/deleted messages should be logged.",
         val: true
+      },
+      anti_log_delete: {
+        type: "BOOL",
+        desc: "Whether or not the bot should resend a deleted log message.",
+        val: false
+      },
+      mute_role: {
+        type: "ROLE",
+        desc: "Role used for muting members (separate from timeout)."
+      },
+      automod_enabled: {
+        type: "BOOL",
+        desc: "Enable/disable the automod system.",
+        val: false
+      },
+      role_autokick: {
+        type: "TEXT",
+        desc: "Role autokick settings (format: roleID:days,roleID:days)",
+        val: ""
+      },
+      auto_slowdown: {
+        type: "BOOL",
+        desc: "Enable automatic channel slowdown during high activity.",
+        val: false
+      },
+      regex_filters: {
+        type: "TEXT",
+        desc: "Custom regex patterns for automod (format: pattern:action)",
+        val: ""
+      },
+      autokick_delay: {
+        type: "TEXT",
+        desc: "Role autokick delay settings",
+        val: "0" //disabled yes
+      },
+      autokick_enabled: {
+        type: "BOOL",
+        desc: "Delay before autokicking is triggered",
+        val: false
       }
     }
   },
@@ -80,6 +134,40 @@ export const settingsDefinition: Record<
         type: "BOOL",
         desc: "Whether or not the original message should be edited when a news message is updated.",
         val: true
+      },
+      categories: {
+        type: "TEXT",
+        desc: "News categories and their roles (format: name:roleID)",
+        val: ""
+      },
+      dm_enabled: {
+        type: "BOOL",
+        desc: "Allow users to receive news in DMs.",
+        val: false
+      }
+    }
+  },
+  starboard: {
+    description: "Configure the starboard system.",
+    settings: {
+      enabled: {
+        type: "BOOL",
+        desc: "Enable/disable the starboard.",
+        val: false
+      },
+      channel: {
+        type: "CHANNEL",
+        desc: "Channel where starred messages appear."
+      },
+      emoji: {
+        type: "TEXT",
+        desc: "Emoji used for starring messages.",
+        val: "⭐"
+      },
+      threshold: {
+        type: "INTEGER",
+        desc: "Reactions needed for a message to be starred.",
+        val: 3
       }
     }
   },
@@ -89,6 +177,11 @@ export const settingsDefinition: Record<
       shown: {
         type: "BOOL",
         desc: "Whether or not the server should be shown on the serverboard.",
+        val: false
+      },
+      server_invite: {
+        type: "BOOL",
+        desc: "Whether to show server invite on the serverboard.",
         val: false
       }
     }
@@ -106,7 +199,10 @@ export const settingsDefinition: Record<
         desc: "Text sent when a user leaves. (name) - username, (count) - member count, (servername) - server name.",
         val: "(name) has left the server! 😥"
       },
-      channel: { type: "CHANNEL", desc: "ID of the channel where welcome messages are sent." },
+      channel: {
+        type: "CHANNEL",
+        desc: "ID of the channel where welcome messages are sent."
+      },
       join_dm: {
         type: "BOOL",
         desc: "Whether or not the bot should send a custom DM message to the user upon joining.",
@@ -116,6 +212,16 @@ export const settingsDefinition: Record<
         type: "TEXT",
         desc: "Text sent in the user's DM when they join the server. Same syntax as join_text.",
         val: "Welcome to (servername), (name)! Interestingly, you just helped us reach (count) members. Have a nice day!"
+      },
+      role_retain: {
+        type: "BOOL",
+        desc: "Keep user roles when they rejoin.",
+        val: false
+      },
+      role_retain_except: {
+        type: "TEXT",
+        desc: "Roles to exclude from retention (comma-separated IDs)",
+        val: ""
       }
     }
   },
@@ -126,6 +232,41 @@ export const settingsDefinition: Record<
         type: "BOOL",
         desc: "Whether or not the bot should reply to certain messages with 'easter egg' messages.",
         val: false
+      },
+      allowed_channels: {
+        type: "TEXT",
+        desc: "Channel IDs where easter eggs are allowed (comma-separated).",
+        val: ""
+      }
+    }
+  },
+  commands: {
+    description: "Configure command availability.",
+    settings: {
+      disabled: {
+        type: "TEXT",
+        desc: "Disabled commands (comma-separated names).",
+        val: ""
+      }
+    }
+  },
+  currency: {
+    description: "Configure the multi-currency system.",
+    settings: {
+      enabled: {
+        type: "BOOL",
+        desc: "Enable the currency system.",
+        val: true
+      },
+      primary_name: {
+        type: "TEXT",
+        desc: "Name of the primary currency.",
+        val: "coins"
+      },
+      secondary_name: {
+        type: "TEXT",
+        desc: "Name of the secondary currency.",
+        val: "gems"
       }
     }
   }
@@ -134,25 +275,20 @@ export const settingsDefinition: Record<
 export const settingsKeys = Object.keys(settingsDefinition) as (keyof typeof settingsDefinition)[];
 const database = getDatabase(tableDefinition);
 const getQuery = database.query("SELECT * FROM settings WHERE guildID = $1 AND key = $2;");
-const listPublicQuery = database.query(
-  "SELECT * FROM settings WHERE key = 'serverboard.shown' AND value = '1';"
-);
+const listPublicQuery = database.query("SELECT * FROM settings WHERE key = 'serverboard.shown' AND value = '1';");
 const deleteQuery = database.query("DELETE FROM settings WHERE guildID = $1 AND key = $2;");
-const insertQuery = database.query(
-  "INSERT INTO settings (guildID, key, value) VALUES (?1, ?2, ?3);"
-);
+const insertQuery = database.query("INSERT INTO settings (guildID, key, value) VALUES (?1, ?2, ?3);");
 
-export function getSetting<
-  K extends keyof typeof settingsDefinition,
-  S extends keyof (typeof settingsDefinition)[K]["settings"]
->(
+export function getSetting<K extends keyof typeof settingsDefinition, S extends keyof (typeof settingsDefinition)[K]["settings"]>(
   guildID: string,
   key: K,
   setting: S
 ): SqlType<(typeof settingsDefinition)[K]["settings"][S]["type"]> | null {
-  let res = getQuery.all(JSON.stringify(guildID), key + "." + setting) as TypeOfDefinition<
-    typeof tableDefinition
-  >[];
+  if (!settingsDefinition[key] || !settingsDefinition[key].settings[setting]) {
+    console.error(`Setting ${key}.${setting} does not exist in the database. (invalid)`)
+    return null;
+  }
+  let res = getQuery.all(JSON.stringify(guildID), key + "." + setting) as TypeOfDefinition<typeof tableDefinition>[];
   const set = settingsDefinition[key].settings[setting];
 
   if (!res.length) {
@@ -173,7 +309,7 @@ export function getSetting<
     case "LIST":
       return kominator(res[0].value) as SqlType<typeof set.type>;
     default:
-      return "WIP"; // as TypeOfKey<K>;
+      return "WIP";
   }
 }
 
@@ -181,7 +317,7 @@ export function setSetting<K extends keyof typeof settingsDefinition>(
   guildID: string,
   key: K,
   setting: string,
-  value: string // TypeOfKey<K>
+  value: string
 ) {
   const doInsert = getSetting(guildID, key, setting) == null;
   if (!doInsert) deleteQuery.all(JSON.stringify(guildID), key + "." + setting);
@@ -189,12 +325,7 @@ export function setSetting<K extends keyof typeof settingsDefinition>(
 }
 
 export function listPublicServers() {
-  return (listPublicQuery.all() as TypeOfDefinition<typeof tableDefinition>[]).map(entry =>
-    JSON.parse(entry.guildID)
-  );
+  return (listPublicQuery.all() as TypeOfDefinition<typeof tableDefinition>[]).map(entry => JSON.parse(entry.guildID));
 }
 
-// Utility type
-type TypeOfKey<K extends keyof typeof settingsDefinition, S extends string> = SqlType<
-  (typeof settingsDefinition)[K]["settings"][S]["type"]
->;
+type TypeOfKey<K extends keyof typeof settingsDefinition, S extends string> = SqlType<(typeof settingsDefinition)[K]["settings"][S]["type"]>;

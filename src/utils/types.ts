@@ -1,3 +1,3 @@
 import { ClientEvents } from "discord.js";
 
-export type Event<T extends keyof ClientEvents> = (...args: ClientEvents[T][0][]) => any;
+export type Event<K extends keyof ClientEvents> = ((...args: ClientEvents[K]) => any);
