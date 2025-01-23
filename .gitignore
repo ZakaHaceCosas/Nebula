@@ -3,4 +3,5 @@ node_modules/
 .DS_Store
 data.db
 bun.lockb
+bun.lock
 .idea
