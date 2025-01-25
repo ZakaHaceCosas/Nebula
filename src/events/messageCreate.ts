@@ -1,18 +1,17 @@
 import { EmbedBuilder, type TextChannel } from "discord.js";
-import { readdirSync } from "fs";
-import { join } from "path";
-import { pathToFileURL } from "url";
+import ms from "ms";
+import { easterEggs } from "../handlers/events.ts";
 import { genColor } from "../utils/colorGen";
+import { updateActivity } from "../utils/database/autokick";
+import { getAutomodRules } from "../utils/database/automod";
 import { add, check, remove } from "../utils/database/blocklist";
 import { getLevel, setLevel } from "../utils/database/leveling";
 import { getSetting } from "../utils/database/settings";
-import { getAutomodRules } from "../utils/database/automod"
 import { kominator } from "../utils/kominator";
 import { leavePlease } from "../utils/leavePlease";
-import { Event } from "../utils/types";
-import ms from "ms";
 import { logChannel } from "../utils/logChannel.ts";
-import { updateActivity } from "../utils/database/autokick"
+import { Event } from "../utils/types";
+
 const cooldowns = new Map<string, number>();
 export default (async function run(message) {
   if (message.content.startsWith("!SYSTEM")) {
@@ -50,50 +49,40 @@ export default (async function run(message) {
   if (!check(author.id)) return;
   const guild = message.guild!;
 
-  if (getSetting(guild.id, "moderation", "autokick_enabled")) {
-    updateActivity(guild.id, author.id);
-  }
-
-  if (getSetting(guild.id, "moderation", "automod_enabled")) {
-    const rules = getAutomodRules(guild.id);
-
-    for (const rule of rules) {
-      const whitelistChannels = JSON.parse(rule.whitelist_channels as string);
+  if (getSetting(guild.id, "moderation", "autokick_enabled")) updateActivity(guild.id, author.id);
+  if (getSetting(guild.id, "moderation", "automod_enabled"))
+    for (const rule of getAutomodRules(guild.id)) {
       const whitelistRoles = JSON.parse(rule.whitelist_roles as string);
 
-      if (whitelistChannels.includes(message.channel.id)) continue;
+      if (JSON.parse(rule.whitelist_channels as string).includes(message.channel.id)) continue;
       if (message.member?.roles.cache.some(role => whitelistRoles.includes(role.id))) continue;
 
       try {
-        const regex = new RegExp(rule.pattern as string, "i");
-        if (regex.test(message.content)) {
+        if (new RegExp(rule.pattern as string, "i").test(message.content)) {
           switch (rule.action) {
             case "delete":
               await message.delete();
               break;
 
             case "timeout":
-              if (message.member?.moderatable) {
+              if (message.member?.moderatable)
                 await message.member.timeout(
                   ms(rule.action_duration as string),
                   "Automod: Regex filter violation"
                 );
-              }
               break;
 
             case "kick":
-              if (message.member?.kickable) {
+              if (message.member?.kickable)
                 await message.member.kick("Automod: Regex filter violation");
-              }
               break;
 
             case "ban":
-              if (message.member?.bannable) {
+              if (message.member?.bannable)
                 await message.member.ban({
                   reason: "Automod: Regex filter violation",
                   deleteMessageSeconds: 604800 // 7d
                 });
-              }
               break;
           }
 
@@ -102,34 +91,29 @@ export default (async function run(message) {
               name: "Automod Action",
               iconURL: message.author.displayAvatarURL()
             })
-            .setDescription([
-              `**User**: ${message.author.tag}`,
-              `**Channel**: <#${message.channel.id}>`,
-              `**Action**: ${rule.action}`,
-              `**Trigger**: \`${rule.pattern}\``,
-              `**Message Content**: ${message.content}`
-            ].join("\n"))
+            .setDescription(
+              [
+                `**User**: ${message.author.tag}`,
+                `**Channel**: <#${message.channel.id}>`,
+                `**Action**: ${rule.action}`,
+                `**Trigger**: \`${rule.pattern}\``,
+                `**Message Content**: ${message.content}`
+              ].join("\n")
+            )
             .setColor(genColor(100))
             .setTimestamp();
 
-          await logChannel(guild, embed);
-          return;
+          return await logChannel(guild, embed);
         }
       } catch (error) {
         console.error(`Error with regex pattern: ${rule.pattern}`, error);
       }
     }
-  }
 
-  if (getSetting(guild.id, "easter", "enabled")) {
-    const eventsPath = join(process.cwd(), "src", "events", "easterEggs");
-
-    for (const easterEggFile of readdirSync(eventsPath))
-      (await import(pathToFileURL(join(eventsPath, easterEggFile)).toString())).default(message);
-  }
+  if (getSetting(guild.id, "easter", "enabled"))
+    for (const easterEgg of easterEggs) easterEgg.run(message);
 
   if (!getSetting(guild.id, "leveling", "enabled")) return;
-
   const blockedChannels = getSetting(guild.id, "leveling", "block_channels") as string;
   if (blockedChannels != undefined)
     for (const channelID of kominator(blockedChannels)) if (message.channelId == channelID) return;

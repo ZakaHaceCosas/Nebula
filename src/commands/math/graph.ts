@@ -66,12 +66,10 @@ export async function run(interaction: ChatInputCommandInteraction) {
 
     for (let i = 0; i <= points; i++) {
       const x = xmin + (i * (xmax - xmin)) / points;
-      let y;
 
       try {
-        y = compiled.evaluate({ x });
-
-        if (typeof y !== "number" || !isFinite(y)) continue;
+        const y = compiled.evaluate({ x });
+        if (typeof y != "number" || !isFinite(y)) continue;
 
         const canvasX = ((x - xmin) * width) / (xmax - xmin);
         const canvasY = height - ((y - ymin) * height) / (ymax - ymin);
@@ -88,10 +86,7 @@ export async function run(interaction: ChatInputCommandInteraction) {
     }
 
     ctx.stroke();
-
-    const buffer = canvas.toBuffer();
-    const attachment = new AttachmentBuilder(buffer, { name: "graph.png" });
-
+    const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: "graph.png" });
     const embed = new EmbedBuilder()
       .setTitle("Function Graph")
       .setDescription(`f(x) = ${func}`)

@@ -64,13 +64,12 @@ export async function run(interaction: ChatInputCommandInteraction) {
         const messages = await channel.messages.fetch({ limit: 100 });
         const userMessages = messages.filter(m => m.author.id === targetUser.id).first(amount);
 
-        if (userMessages.length === 0) {
+        if (userMessages.length == 0)
           return await errorEmbed(
             interaction,
             "No messages found",
             "No messages from this user were found in the recent history."
           );
-        }
 
         await channel.bulkDelete(userMessages, true);
         deletedAmount = userMessages.length;

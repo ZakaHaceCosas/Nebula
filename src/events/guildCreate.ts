@@ -30,9 +30,9 @@ export default (async function run(guild) {
   await guild.commands.set(commands.map(command => command.data));
   try {
     const welcomeChannel = guild.systemChannel;
-    if (welcomeChannel)
-      if (welcomeChannel.permissionsFor(guild.client.user)?.has("SendMessages"))
-        await welcomeChannel.send({ embeds: [embed] });
+    if (!welcomeChannel) return;
+    if (!welcomeChannel.permissionsFor(guild.client.user)?.has("SendMessages")) return;
+    await welcomeChannel.send({ embeds: [embed] });
   } catch (e) {
     console.log(e);
   }

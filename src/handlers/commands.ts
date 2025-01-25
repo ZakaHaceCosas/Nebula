@@ -14,56 +14,55 @@ function pushCommand(array: any[], command: any) {
   return array.push({ data: command.data, run: command.run, autocomplete: command.autocomplete });
 }
 
+function pushSubCommand(client: Client, run: any[], autocomplete: any[], command: any) {
+  run.push(command.run);
+  pushCommand(subCommands, command);
+  if ("autocompleteHandler" in command) {
+    command.autocompleteHandler(client);
+    autocomplete.push(command.autocomplete);
+  }
+}
+
 async function createSubCommand(name: string, client: Client) {
   const commandsPath = join(process.cwd(), "src", "commands");
-  const run = [];
-  const autocomplete = [];
+  const run: any[] = [];
+  const autocomplete: any[] = [];
   const command = new SlashCommandBuilder()
     .setName(name.toLowerCase())
     .setDescription("This command has no description.");
 
-  let subCommand;
   for (const subCommandFile of readdirSync(join(commandsPath, name), {
     withFileTypes: true
   })) {
-    const subCommandName = subCommandFile.name.replaceAll(".ts", "");
     if (subCommandFile.isFile()) {
-      subCommand = await import(
+      const subCommand = await import(
         pathToFileURL(join(commandsPath, name, subCommandFile.name)).toString()
       );
 
       command.addSubcommand(subCommand.data);
-      pushCommand(subCommands, subCommand);
+      pushSubCommand(client, run, autocomplete, subCommand);
       continue;
     }
 
     const subCommandGroup = new SlashCommandSubcommandGroupBuilder()
-      .setName(subCommandName.toLowerCase())
+      .setName(subCommandFile.name.replaceAll(".ts", "").toLowerCase())
       .setDescription("This subcommand group has no description.");
 
-    const subCommandGroupFiles = readdirSync(join(commandsPath, name, subCommandFile.name), {
+    for (const subCommandGroupFile of readdirSync(join(commandsPath, name, subCommandFile.name), {
       withFileTypes: true
-    });
-
-    for (const subCommandGroupFile of subCommandGroupFiles) {
+    })) {
       if (!subCommandGroupFile.isFile()) continue;
-      subCommand = await import(
+      const subCommand = await import(
         pathToFileURL(
           join(commandsPath, name, subCommandFile.name, subCommandGroupFile.name)
         ).toString()
       );
 
       subCommandGroup.addSubcommand(subCommand.data);
-      console.log(subCommandGroupFile);
-      pushCommand(subCommands, subCommand);
+      pushSubCommand(client, run, autocomplete, subCommand);
     }
 
     command.addSubcommandGroup(subCommandGroup);
-    run.push(subCommand.run);
-    if ("autocompleteHandler" in subCommand) {
-      subCommand.autocompleteHandler(client);
-      autocomplete.push(subCommand.autocomplete);
-    }
   }
 
   return { data: command, run: run, autocomplete: autocomplete };

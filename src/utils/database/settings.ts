@@ -51,18 +51,16 @@ export const settingsDefinition: Record<
       },
       rewards: {
         type: "TEXT",
-        desc: "Role rewards for levels (format: roleID:level,roleID:level)",
-        val: ""
+        desc: "Role rewards for levels (format: roleID:level,roleID:level)"
       },
       multipliers: {
         type: "TEXT",
-        desc: "XP multipliers for roles/channels (format: multiplier:ID1,ID2)",
-        val: ""
+        desc: "XP multipliers for roles/channels (format: multiplier:ID1,ID2)"
       },
       xp_per_chars: {
         type: "TEXT",
         desc: "XP per character count (format: xp:chars)",
-        val: "1:100"
+        val: "1:50"
       }
     }
   },
@@ -94,8 +92,7 @@ export const settingsDefinition: Record<
       },
       role_autokick: {
         type: "TEXT",
-        desc: "Role autokick settings (format: roleID:days,roleID:days)",
-        val: ""
+        desc: "Role autokick settings (format: roleID:days,roleID:days)"
       },
       auto_slowdown: {
         type: "BOOL",
@@ -104,8 +101,7 @@ export const settingsDefinition: Record<
       },
       regex_filters: {
         type: "TEXT",
-        desc: "Custom regex patterns for automod (format: pattern:action)",
-        val: ""
+        desc: "Custom regex patterns for automod (format: pattern:action)"
       },
       autokick_delay: {
         type: "TEXT",
@@ -220,8 +216,7 @@ export const settingsDefinition: Record<
       },
       role_retain_except: {
         type: "TEXT",
-        desc: "Roles to exclude from retention (comma-separated IDs)",
-        val: ""
+        desc: "Roles to exclude from retention (comma-separated IDs)"
       }
     }
   },
@@ -235,8 +230,7 @@ export const settingsDefinition: Record<
       },
       allowed_channels: {
         type: "TEXT",
-        desc: "Channel IDs where easter eggs are allowed (comma-separated).",
-        val: ""
+        desc: "Channel IDs where easter eggs are allowed (comma-separated)."
       }
     }
   },
@@ -245,8 +239,7 @@ export const settingsDefinition: Record<
     settings: {
       disabled: {
         type: "TEXT",
-        desc: "Disabled commands (comma-separated names).",
-        val: ""
+        desc: "Disabled commands (comma-separated names)."
       }
     }
   },
@@ -275,20 +268,29 @@ export const settingsDefinition: Record<
 export const settingsKeys = Object.keys(settingsDefinition) as (keyof typeof settingsDefinition)[];
 const database = getDatabase(tableDefinition);
 const getQuery = database.query("SELECT * FROM settings WHERE guildID = $1 AND key = $2;");
-const listPublicQuery = database.query("SELECT * FROM settings WHERE key = 'serverboard.shown' AND value = '1';");
+const listPublicQuery = database.query(
+  "SELECT * FROM settings WHERE key = 'serverboard.shown' AND value = '1';"
+);
 const deleteQuery = database.query("DELETE FROM settings WHERE guildID = $1 AND key = $2;");
-const insertQuery = database.query("INSERT INTO settings (guildID, key, value) VALUES (?1, ?2, ?3);");
+const insertQuery = database.query(
+  "INSERT INTO settings (guildID, key, value) VALUES (?1, ?2, ?3);"
+);
 
-export function getSetting<K extends keyof typeof settingsDefinition, S extends keyof (typeof settingsDefinition)[K]["settings"]>(
+export function getSetting<
+  K extends keyof typeof settingsDefinition,
+  S extends keyof (typeof settingsDefinition)[K]["settings"]
+>(
   guildID: string,
   key: K,
   setting: S
 ): SqlType<(typeof settingsDefinition)[K]["settings"][S]["type"]> | null {
   if (!settingsDefinition[key] || !settingsDefinition[key].settings[setting]) {
-    console.error(`Setting ${key}.${setting} does not exist in the database. (invalid)`)
+    console.error(`Setting ${key}.${setting} does not exist in the database. (invalid)`);
     return null;
   }
-  let res = getQuery.all(JSON.stringify(guildID), key + "." + setting) as TypeOfDefinition<typeof tableDefinition>[];
+  let res = getQuery.all(JSON.stringify(guildID), key + "." + setting) as TypeOfDefinition<
+    typeof tableDefinition
+  >[];
   const set = settingsDefinition[key].settings[setting];
 
   if (!res.length) {
@@ -325,7 +327,7 @@ export function setSetting<K extends keyof typeof settingsDefinition>(
 }
 
 export function listPublicServers() {
-  return (listPublicQuery.all() as TypeOfDefinition<typeof tableDefinition>[]).map(entry => JSON.parse(entry.guildID));
+  return (listPublicQuery.all() as TypeOfDefinition<typeof tableDefinition>[]).map(entry =>
+    JSON.parse(entry.guildID)
+  );
 }
-
-type TypeOfKey<K extends keyof typeof settingsDefinition, S extends string> = SqlType<(typeof settingsDefinition)[K]["settings"][S]["type"]>;
