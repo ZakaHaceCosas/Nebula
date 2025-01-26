@@ -15,7 +15,7 @@ export const settingsDefinition: Record<
   string,
   {
     description: string;
-    settings: Record<string, { type: FieldData; desc: string; val?: any }>;
+    settings: Record<string, { type: FieldData; desc: string; val?: any, emoji: string }>;
   }
 > = {
   leveling: {
@@ -24,94 +24,113 @@ export const settingsDefinition: Record<
       enabled: {
         type: "BOOL",
         desc: "Enable/disable the leveling system.",
-        val: true
+        val: true,
+        emoji: "🍍",
       },
       channel: {
         type: "CHANNEL",
-        desc: "ID of the log channel for leveling-related stuff (i.e someone leveling up)."
+        desc: "ID of the log channel for leveling-related stuff (i.e someone leveling up).",
+        emoji: "🍍",
       },
       block_channels: {
         type: "CHANNEL",
-        desc: "ID(s) of the channels where messages aren't counted, comma separated."
+        desc: "ID(s) of the channels where messages aren't counted, comma separated.",
+        emoji: "🍍",
       },
       xp_gain: {
         type: "INTEGER",
         desc: "Set the amount of XP a user gains per message.",
-        val: 2
+        val: 2,
+        emoji: "🍍",
       },
       cooldown: {
         type: "INTEGER",
         desc: "Set the cooldown between messages that add XP (in seconds).",
-        val: 2
+        val: 2,
+        emoji: "🍍",
       },
       difficulty: {
         type: "INTEGER",
         desc: "Set the difficulty (ex: 2 will make it 2x harder to level up).",
-        val: 1
+        val: 1,
+        emoji: "🍍",
       },
       rewards: {
         type: "TEXT",
-        desc: "Role rewards for levels (format: roleID:level,roleID:level)"
+        desc: "Role rewards for levels (format: roleID:level,roleID:level)",
+        emoji: "🍍",
       },
       multipliers: {
         type: "TEXT",
-        desc: "XP multipliers for roles/channels (format: multiplier:ID1,ID2)"
+        desc: "XP multipliers for roles/channels (format: multiplier:ID1,ID2)",
+        emoji: "🍍",
       },
       xp_per_chars: {
         type: "TEXT",
         desc: "XP per character count (format: xp:chars)",
-        val: "1:50"
-      }
-    }
+        val: "1:50",
+        emoji: "🍍",
+      },
+    },
   },
   moderation: {
     description: "Change where Sokora sends moderation logs.",
     settings: {
       channel: {
         type: "CHANNEL",
-        desc: "ID of the log channel for moderation-related stuff (i.e a message being edited)."
+        desc: "ID of the log channel for moderation-related stuff (i.e a message being edited).",
+        emoji: "🍍",
       },
       log_messages: {
         type: "BOOL",
         desc: "Whether or not edited/deleted messages should be logged.",
-        val: true
+        val: true,
+        emoji: "🍍",
       },
       anti_log_delete: {
         type: "BOOL",
         desc: "Whether or not the bot should resend a deleted log message.",
-        val: false
+        val: false,
+        emoji: "🍍",
       },
       mute_role: {
         type: "ROLE",
-        desc: "Role used for muting members (separate from timeout)."
+        desc: "Role used for muting members (separate from timeout).",
+        emoji: "🍍",
       },
       automod_enabled: {
         type: "BOOL",
         desc: "Enable/disable the automod system.",
-        val: false
+        val: false,
+        emoji: "🍍",
       },
       role_autokick: {
         type: "TEXT",
-        desc: "Role autokick settings (format: roleID:days,roleID:days)"
+        desc: "Role autokick settings (format: roleID:days,roleID:days)",
+        emoji: "🍍",
       },
       auto_slowdown: {
         type: "BOOL",
         desc: "Enable automatic channel slowdown during high activity.",
-        val: false
+        val: false,
+        emoji: "🍍",
       },
       regex_filters: {
         type: "TEXT",
-        desc: "Custom regex patterns for automod (format: pattern:action)"
+        desc: "Custom regex patterns for automod (format: pattern:action)",
+        emoji: "🍍",
       },
       autokick_delay: {
         type: "TEXT",
         desc: "Role autokick delay settings",
-        val: "0" //disabled yes
+        val: "0", //disabled yes
+        emoji: "🍍",
       },
       autokick_enabled: {
         type: "BOOL",
         desc: "Delay before autokicking is triggered",
-        val: false
+        val: false,
+        emoji: "🍍",
       }
     }
   },
@@ -120,26 +139,31 @@ export const settingsDefinition: Record<
     settings: {
       channel_id: {
         type: "CHANNEL",
-        desc: "ID of the channel where news messages are sent."
+        desc: "ID of the channel where news messages are sent.",
+        emoji: "🍍",
       },
       role_id: {
         type: "ROLE",
-        desc: "ID of the roles that should be pinged when a news message is sent."
+        desc: "ID of the roles that should be pinged when a news message is sent.",
+        emoji: "🍍",
       },
       edit_original_message: {
         type: "BOOL",
         desc: "Whether or not the original message should be edited when a news message is updated.",
-        val: true
+        val: true,
+        emoji: "🍍",
       },
       categories: {
         type: "TEXT",
         desc: "News categories and their roles (format: name:roleID)",
-        val: ""
+        val: "",
+        emoji: "🍍",
       },
       dm_enabled: {
         type: "BOOL",
         desc: "Allow users to receive news in DMs.",
-        val: false
+        val: false,
+        emoji: "🍍",
       }
     }
   },
@@ -149,21 +173,25 @@ export const settingsDefinition: Record<
       enabled: {
         type: "BOOL",
         desc: "Enable/disable the starboard.",
-        val: false
+        val: false,
+        emoji: "🍍",
       },
       channel: {
         type: "CHANNEL",
-        desc: "Channel where starred messages appear."
+        desc: "Channel where starred messages appear.",
+        emoji: "🍍",
       },
       emoji: {
         type: "TEXT",
         desc: "Emoji used for starring messages.",
-        val: "⭐"
+        val: "⭐",
+        emoji: "🍍",
       },
       threshold: {
         type: "INTEGER",
         desc: "Reactions needed for a message to be starred.",
-        val: 3
+        val: 3,
+        emoji: "🍍",
       }
     }
   },
@@ -173,12 +201,14 @@ export const settingsDefinition: Record<
       shown: {
         type: "BOOL",
         desc: "Whether or not the server should be shown on the serverboard.",
-        val: false
+        val: false,
+        emoji: "🍍",
       },
       server_invite: {
         type: "BOOL",
         desc: "Whether to show server invite on the serverboard.",
-        val: false
+        val: false,
+        emoji: "🍍",
       }
     }
   },
@@ -188,35 +218,42 @@ export const settingsDefinition: Record<
       join_text: {
         type: "TEXT",
         desc: "Text sent when a user joins. (name) - username, (count) - member count, (servername) - server name.",
-        val: "Welcome to (servername), (name)! Interestingly, you just helped us reach (count) members. Have a nice day!"
+        val: "Welcome to (servername), (name)! Interestingly, you just helped us reach (count) members. Have a nice day!",
+        emoji: "🍍",
       },
       leave_text: {
         type: "TEXT",
         desc: "Text sent when a user leaves. (name) - username, (count) - member count, (servername) - server name.",
-        val: "(name) has left the server! 😥"
+        val: "(name) has left the server! 😥",
+        emoji: "🍍",
       },
       channel: {
         type: "CHANNEL",
-        desc: "ID of the channel where welcome messages are sent."
+        desc: "ID of the channel where welcome messages are sent.",
+        emoji: "🍍",
       },
       join_dm: {
         type: "BOOL",
         desc: "Whether or not the bot should send a custom DM message to the user upon joining.",
-        val: false
+        val: false,
+        emoji: "🍍",
       },
       dm_text: {
         type: "TEXT",
         desc: "Text sent in the user's DM when they join the server. Same syntax as join_text.",
-        val: "Welcome to (servername), (name)! Interestingly, you just helped us reach (count) members. Have a nice day!"
+        val: "Welcome to (servername), (name)! Interestingly, you just helped us reach (count) members. Have a nice day!",
+        emoji: "🍍",
       },
       role_retain: {
         type: "BOOL",
         desc: "Keep user roles when they rejoin.",
-        val: false
+        val: false,
+        emoji: "🍍",
       },
       role_retain_except: {
         type: "TEXT",
-        desc: "Roles to exclude from retention (comma-separated IDs)"
+        desc: "Roles to exclude from retention (comma-separated IDs)",
+        emoji: "🍍",
       }
     }
   },
@@ -226,11 +263,13 @@ export const settingsDefinition: Record<
       enabled: {
         type: "BOOL",
         desc: "Whether or not the bot should reply to certain messages with 'easter egg' messages.",
-        val: false
+        val: false,
+        emoji: "🍍",
       },
       allowed_channels: {
         type: "TEXT",
-        desc: "Channel IDs where easter eggs are allowed (comma-separated)."
+        desc: "Channel IDs where easter eggs are allowed (comma-separated).",
+        emoji: "🍍",
       }
     }
   },
@@ -239,7 +278,8 @@ export const settingsDefinition: Record<
     settings: {
       disabled: {
         type: "TEXT",
-        desc: "Disabled commands (comma-separated names)."
+        desc: "Disabled commands (comma-separated names).",
+        emoji: "🍍",
       }
     }
   },
@@ -249,17 +289,20 @@ export const settingsDefinition: Record<
       enabled: {
         type: "BOOL",
         desc: "Enable the currency system.",
-        val: true
+        val: true,
+        emoji: "🍍",
       },
       primary_name: {
         type: "TEXT",
         desc: "Name of the primary currency.",
-        val: "coins"
+        val: "coins",
+        emoji: "🍍",
       },
       secondary_name: {
         type: "TEXT",
         desc: "Name of the secondary currency.",
-        val: "gems"
+        val: "gems",
+        emoji: "🍍",
       }
     }
   }

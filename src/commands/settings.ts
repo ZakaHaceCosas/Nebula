@@ -15,6 +15,7 @@ import {
   settingsKeys
 } from "../utils/database/settings";
 import { errorEmbed } from "../utils/embeds/errorEmbed";
+import { capitalize } from "../utils/capitalize";
 
 export let data = new SlashCommandBuilder()
   .setName("settings")
@@ -114,24 +115,21 @@ export async function run(interaction: ChatInputCommandInteraction) {
   };
 
   if (!values.length) {
-    const field: string[] = [];
-    Object.keys(settingsDef.settings).forEach(name =>
-      field.push(`**${name}**: ${settingText(name)}`)
-    );
-
     const embed = new EmbedBuilder()
-      .setAuthor({ name: `Settings of ${key}` })
-      .setDescription(`${settingsDef.description}`)
-      .addFields({ name: "🧑‍🔧 • Settings", value: field.join("\n") })
+      .setAuthor({ name: `${capitalize(key)} settings` })
+      .setDescription(
+        Object.keys(settingsDef.settings).map(setting => `${settingsDef.settings[setting].emoji} **• ${capitalize(setting.replaceAll("_", " "))}**: ${settingText(setting)}`).join("\n")
+      )
       .setColor(genColor(100));
 
     return await interaction.reply({ embeds: [embed] });
   }
 
   const embed = new EmbedBuilder()
-    .setAuthor({ name: "Parameters changed." })
-    .setColor(genColor(100));
+    .setColor(genColor(100))
+    .setAuthor({ name: `✅ • ${capitalize(key)} settings changed` })
 
+  let description = ""
   for (let i = 0; i < values.length; i++) {
     const option = values[i];
 
@@ -144,16 +142,14 @@ export async function run(interaction: ChatInputCommandInteraction) {
     )
       return await errorEmbed(
         interaction,
-        "Can't view this channel.",
+        "I can't view this channel.",
         "You can either give the **View Channel** permission for Sokora or use a channel from the dropdown menu."
       );
 
     setSetting(guild.id, key, option.name, option.value as string);
-    embed.addFields({
-      name: option.name,
-      value: settingText(option.name.toString()!)
-    });
+    description += `**${capitalize(option.name)}:** ${settingText(option.name.toString()!)}\n`
   }
+  embed.setDescription(description)
 
   await interaction.reply({ embeds: [embed] });
 }
