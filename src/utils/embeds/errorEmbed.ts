@@ -1,4 +1,4 @@
-import { EmbedBuilder, type ButtonInteraction, type ChatInputCommandInteraction } from "discord.js";
+import { EmbedBuilder, MessageFlags, type ButtonInteraction, type ChatInputCommandInteraction } from "discord.js";
 import { genColor } from "../colorGen";
 
 /**
@@ -21,6 +21,6 @@ export async function errorEmbed(
     .setDescription(content.join("\n"))
     .setColor(genColor(0));
 
-  if (interaction.replied) return await interaction.followUp({ embeds: [embed], ephemeral: true });
-  return await interaction.reply({ embeds: [embed], ephemeral: true });
+  if (interaction.replied) return await interaction.followUp({ embeds: [embed], flags: MessageFlags.Ephemeral });
+  return await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 }

@@ -1,6 +1,7 @@
 import {
   ActionRowBuilder,
   EmbedBuilder,
+  MessageFlags,
   ModalBuilder,
   SlashCommandSubcommandBuilder,
   TextInputBuilder,
@@ -68,7 +69,7 @@ export async function run(interaction: ChatInputCommandInteraction) {
     await sendChannelNews(guild, id, interaction).catch(err => console.error(err));
     await i.reply({
       embeds: [new EmbedBuilder().setTitle("News added.").setColor(genColor(100))],
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
   });
 }
