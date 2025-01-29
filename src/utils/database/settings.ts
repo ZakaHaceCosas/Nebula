@@ -314,6 +314,9 @@ const getQuery = database.query("SELECT * FROM settings WHERE guildID = $1 AND k
 const listPublicQuery = database.query(
   "SELECT * FROM settings WHERE key = 'serverboard.shown' AND value = '1';"
 );
+const listPublicWithInvitesEnabledQuery = database.query(
+  "SELECT * FROM settings WHERE key = 'serverboard.server_invite' AND value = '1';"
+)
 const deleteQuery = database.query("DELETE FROM settings WHERE guildID = $1 AND key = $2;");
 const insertQuery = database.query(
   "INSERT INTO settings (guildID, key, value) VALUES (?1, ?2, ?3);"
@@ -369,8 +372,15 @@ export function setSetting<K extends keyof typeof settingsDefinition>(
   insertQuery.run(JSON.stringify(guildID), `${key}.${setting}`, value);
 }
 
-export function listPublicServers() {
-  return (listPublicQuery.all() as TypeOfDefinition<typeof tableDefinition>[]).map(entry =>
-    JSON.parse(entry.guildID)
-  );
+export function listPublicServers(): { guildID: string, showInvite: boolean }[] {
+  const publicGuildSet = new Set((listPublicQuery.all() as TypeOfDefinition<typeof tableDefinition>[]).map(entry => JSON.parse(entry.guildID)));
+  // you know that time-complexity thingy? idk much but uh an array has O(n) and a JS Set() has O(1) which should mean using a Set is more performant
+  const inviteGuildsSet = new Set((listPublicWithInvitesEnabledQuery.all() as TypeOfDefinition<typeof tableDefinition>[]).map(entry => JSON.parse(entry.guildID)));
+
+  return (Array.from(publicGuildSet)).map(entry => {
+    return {
+        guildID: entry,
+        showInvite: inviteGuildsSet.has(entry),
+    }
+  });
 }

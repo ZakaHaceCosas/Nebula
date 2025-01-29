@@ -3,6 +3,7 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
+  Guild,
   SlashCommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
@@ -16,9 +17,16 @@ export const data = new SlashCommandBuilder()
   .addNumberOption(number => number.setName("page").setDescription("The page you want to see."));
 
 export async function run(interaction: ChatInputCommandInteraction) {
-  const guildList = (
-    await Promise.all(listPublicServers().map(id => interaction.client.guilds.fetch(id)))
-  ).sort((a, b) => b.memberCount - a.memberCount);
+  const guildList: { guild: Guild; showInvite: boolean }[] = (
+    await Promise.all(
+      listPublicServers().map(async entry => {
+        return {
+          guild: await interaction.client.guilds.fetch(entry.guildID),
+          showInvite: entry.showInvite
+        };
+      })
+    )
+  ).sort((a, b) => b.guild.memberCount - a.guild.memberCount);
 
   const pages = guildList.length;
   if (!pages)
@@ -32,7 +40,13 @@ export async function run(interaction: ChatInputCommandInteraction) {
   let page = (argPage - 1 <= 0 ? 0 : argPage - 1 > pages ? pages - 1 : argPage - 1) || 0;
 
   async function getEmbed() {
-    return await serverEmbed({ guild: guildList[page], page: page + 1, pages });
+    return await serverEmbed({
+      guild: guildList[page].guild,
+      showInvite: guildList[page].showInvite,
+      page: page + 1,
+      pages,
+      roles: true
+    });
   }
 
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(

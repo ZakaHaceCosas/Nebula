@@ -4,13 +4,14 @@
  * @returns Embed that contains the guild info.
  */
 
-import { EmbedBuilder, type Guild } from "discord.js";
+import { EmbedBuilder, Invite, type Guild } from "discord.js";
 import { genColor } from "../colorGen";
 import { imageColor } from "../imageColor";
 import { pluralOrNot } from "../pluralOrNot";
 
 type Options = {
   guild: Guild;
+  showInvite: boolean;
   roles?: boolean;
   page?: number;
   pages?: number;
@@ -66,6 +67,8 @@ export async function serverEmbed(options: Options) {
               .join(", ")}${rolesLength > 5 ? ` and **${rolesLength - 5}** more` : ""}`
     });
 
+  const channelCount = channelSizes.text + channelSizes.voice;
+
   embed.addFields(
     {
       name: `👥 • ${guild.memberCount?.toLocaleString("en-US")} members`,
@@ -76,7 +79,7 @@ export async function serverEmbed(options: Options) {
       inline: true
     },
     {
-      name: `🗨️ • ${channelSizes.text + channelSizes.voice} ${pluralOrNot("channel", channelSizes.text + channelSizes.voice)}`,
+      name: `🗨️ • ${channelCount} ${pluralOrNot("channel", channelCount)}`,
       value: [
         `**${channelSizes.text}** text • **${channelSizes.voice}** voice`,
         `**${channelSizes.categories}** ${pluralOrNot("category", channelSizes.categories)}`
@@ -94,6 +97,36 @@ export async function serverEmbed(options: Options) {
       inline: true
     }
   );
+
+  if (options.showInvite) {
+    const previousInvite: Invite | undefined = (await options.guild.invites.fetch()).find(
+      invite =>
+        invite.inviter?.id === "873918300726394960" &&
+        invite.maxUses === null &&
+        invite.expiresAt === null
+    );
+
+    if (!(options.guild.rulesChannel)) return embed;
+    // TODO - either
+    // 1. show an error to the server owner
+    // 2. use the 1st channel of the server if no rules channel exists)
+
+    const inviteUrl = previousInvite
+      ? previousInvite.url
+      : await options.guild.rulesChannel.createInvite({
+          maxAge: undefined,
+          maxUses: undefined,
+          reason: "Serverboard",
+          temporary: false,
+          unique: true
+        });
+
+    embed.addFields({
+      name: `🚪 • Join in!`,
+      value: `This server allows you to join from here. ${inviteUrl}`,
+      inline: true
+    });
+  }
 
   return embed;
 }
