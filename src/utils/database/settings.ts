@@ -315,7 +315,7 @@ const listPublicQuery = database.query(
   "SELECT * FROM settings WHERE key = 'serverboard.shown' AND value = '1';"
 );
 const listPublicWithInvitesEnabledQuery = database.query(
-  "SELECT * FROM settings WHERE key = 'serverboard.server_invite' AND value = '1';"
+  "SELECT * FROM settings WHERE EXISTS (SELECT 1 FROM settings WHERE key = 'serverboard.server_invite' AND value = '1') AND EXISTS (SELECT 1 FROM settings WHERE key = 'serverboard.shown' AND value = '1');"
 )
 const deleteQuery = database.query("DELETE FROM settings WHERE guildID = $1 AND key = $2;");
 const insertQuery = database.query(
