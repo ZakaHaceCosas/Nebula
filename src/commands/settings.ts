@@ -147,7 +147,7 @@ export async function run(interaction: ChatInputCommandInteraction) {
       );
 
     setSetting(guild.id, key, option.name, option.value as string);
-    description += `**${capitalize(option.name)}:** ${settingText(option.name.toString()!)}\n`
+    description += `**${capitalize(option.name)?.replace("_", " ")}:** ${settingText(option.name.toString()!)}\n`
   }
   embed.setDescription(description)
 
