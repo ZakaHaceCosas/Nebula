@@ -19,7 +19,7 @@ export const settingsDefinition: Record<
   }
 > = {
   leveling: {
-    description: "Customise the behaviour of the leveling system.",
+    description: "Customize the behavior of the leveling system.",
     settings: {
       enabled: {
         type: "BOOL",

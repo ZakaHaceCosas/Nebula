@@ -1,5 +1,5 @@
 {
-  // Note: this file must be committed for package version consisency for everyone who uses bun install 
+  // Note: this file must be committed for package version consistency for everyone who uses bun install 
   "lockfileVersion": 1,
   "workspaces": {
     "": {
