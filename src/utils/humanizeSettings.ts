@@ -7,8 +7,8 @@ export function humanizeSettings(string: string) {
   const humanized = string
     .trim()
     .replaceAll("_", " ")
-    .replaceAll("true", "***Enabled***")
-    .replaceAll("false", "***Disabled***")
+    .replaceAll("true", "Enabled")
+    .replaceAll("false", "Disabled")
     .replaceAll("(name)", "`(name)`")
     .replaceAll("(servername)", "`(servername)`")
     .replaceAll("(count)", "`(count)`");
