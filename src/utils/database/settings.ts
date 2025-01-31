@@ -7,19 +7,19 @@ const tableDefinition = {
   definition: {
     guildID: "TEXT",
     key: "TEXT",
-    value: "TEXT"
-  }
+    value: "TEXT",
+  },
 } satisfies TableDefinition;
 
 export const settingsDefinition: Record<
   string,
   {
     description: string;
-    settings: Record<string, { type: FieldData; desc: string; val?: any, emoji: string }>;
+    settings: Record<string, { type: FieldData; desc: string; val?: any; emoji: string }>;
   }
 > = {
   leveling: {
-    description: "Customise the behaviour of the leveling system.",
+    description: "Customize the behavior of the leveling system.",
     settings: {
       enabled: {
         type: "BOOL",
@@ -131,8 +131,8 @@ export const settingsDefinition: Record<
         desc: "Delay before autokicking is triggered",
         val: false,
         emoji: "🍍",
-      }
-    }
+      },
+    },
   },
   news: {
     description: "Configure news for your server.",
@@ -164,8 +164,8 @@ export const settingsDefinition: Record<
         desc: "Allow users to receive news in DMs.",
         val: false,
         emoji: "🍍",
-      }
-    }
+      },
+    },
   },
   starboard: {
     description: "Configure the starboard system.",
@@ -192,8 +192,8 @@ export const settingsDefinition: Record<
         desc: "Reactions needed for a message to be starred.",
         val: 3,
         emoji: "🍍",
-      }
-    }
+      },
+    },
   },
   serverboard: {
     description: "Configure your server's appearance on the serverboard.",
@@ -209,8 +209,13 @@ export const settingsDefinition: Record<
         desc: "Whether to show server invite on the serverboard.",
         val: false,
         emoji: "🍍",
-      }
-    }
+      },
+      invite_channel: {
+        type: "CHANNEL",
+        desc: "Channel for the invite. If unset, if a rules channel exists uses it, hides the invite otherwise.",
+        emoji: "🍍",
+      },
+    },
   },
   welcome: {
     description: "Change how Sokora welcomes your new users.",
@@ -254,8 +259,8 @@ export const settingsDefinition: Record<
         type: "TEXT",
         desc: "Roles to exclude from retention (comma-separated IDs)",
         emoji: "🍍",
-      }
-    }
+      },
+    },
   },
   easter: {
     description: "Enable/disable easter eggs.",
@@ -270,8 +275,8 @@ export const settingsDefinition: Record<
         type: "TEXT",
         desc: "Channel IDs where easter eggs are allowed (comma-separated).",
         emoji: "🍍",
-      }
-    }
+      },
+    },
   },
   commands: {
     description: "Configure command availability.",
@@ -280,8 +285,8 @@ export const settingsDefinition: Record<
         type: "TEXT",
         desc: "Disabled commands (comma-separated names).",
         emoji: "🍍",
-      }
-    }
+      },
+    },
   },
   currency: {
     description: "Configure the multi-currency system.",
@@ -303,9 +308,9 @@ export const settingsDefinition: Record<
         desc: "Name of the secondary currency.",
         val: "gems",
         emoji: "🍍",
-      }
-    }
-  }
+      },
+    },
+  },
 };
 
 export const settingsKeys = Object.keys(settingsDefinition) as (keyof typeof settingsDefinition)[];
@@ -313,6 +318,9 @@ const database = getDatabase(tableDefinition);
 const getQuery = database.query("SELECT * FROM settings WHERE guildID = $1 AND key = $2;");
 const listPublicQuery = database.query(
   "SELECT * FROM settings WHERE key = 'serverboard.shown' AND value = '1';"
+);
+const listPublicWithInvitesEnabledQuery = database.query(
+  "SELECT * FROM settings WHERE EXISTS (SELECT 1 FROM settings WHERE key = 'serverboard.server_invite' AND value = '1') AND EXISTS (SELECT 1 FROM settings WHERE key = 'serverboard.shown' AND value = '1');"
 );
 const deleteQuery = database.query("DELETE FROM settings WHERE guildID = $1 AND key = $2;");
 const insertQuery = database.query(
@@ -369,8 +377,30 @@ export function setSetting<K extends keyof typeof settingsDefinition>(
   insertQuery.run(JSON.stringify(guildID), `${key}.${setting}`, value);
 }
 
-export function listPublicServers() {
-  return (listPublicQuery.all() as TypeOfDefinition<typeof tableDefinition>[]).map(entry =>
-    JSON.parse(entry.guildID)
+export function listPublicServers(): {
+  guildID: string;
+  showInvite: boolean;
+  inviteChannelId: string | null;
+}[] {
+  const publicGuildSet = new Set(
+    (listPublicQuery.all() as TypeOfDefinition<typeof tableDefinition>[]).map(entry =>
+      JSON.parse(entry.guildID)
+    )
   );
+  // you know that time-complexity thingy? idk much but uh an array has O(n) and a JS Set() has O(1) which should mean using a Set is more performant
+  const inviteGuildsSet = new Set(
+    (listPublicWithInvitesEnabledQuery.all() as TypeOfDefinition<typeof tableDefinition>[]).map(
+      entry => JSON.parse(entry.guildID)
+    )
+  );
+
+  return Array.from(publicGuildSet).map(entry => {
+    const inviteChannel = getSetting(entry, "serverboard", "invite_channel");
+
+    return {
+      guildID: entry,
+      showInvite: inviteGuildsSet.has(entry),
+      inviteChannelId: inviteChannel ? inviteChannel.toString() : null,
+    };
+  });
 }

@@ -20,7 +20,10 @@ export default (async function run(oldMessage, newMessage) {
       name: `•  ${author.displayName} edited a message.`,
       iconURL: author.displayAvatarURL()
     })
-    .setDescription(`[Jump to message](${oldMessage.url})`)
+    .setDescription(
+      `[Jump to message](${oldMessage.url}) • [See ${author.displayName}'s profile](https://discord.com/users/${author.id})`
+    )
+    .setTimestamp(new Date())
     .addFields(
       {
         name: "🖋️ • Old message",

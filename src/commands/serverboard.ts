@@ -3,8 +3,9 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
+  Guild,
   SlashCommandBuilder,
-  type ChatInputCommandInteraction
+  type ChatInputCommandInteraction,
 } from "discord.js";
 import { listPublicServers } from "../utils/database/settings";
 import { errorEmbed } from "../utils/embeds/errorEmbed";
@@ -16,9 +17,17 @@ export const data = new SlashCommandBuilder()
   .addNumberOption(number => number.setName("page").setDescription("The page you want to see."));
 
 export async function run(interaction: ChatInputCommandInteraction) {
-  const guildList = (
-    await Promise.all(listPublicServers().map(id => interaction.client.guilds.fetch(id)))
-  ).sort((a, b) => b.memberCount - a.memberCount);
+  const guildList: { guild: Guild; showInvite: boolean; inviteChannelId: string | null }[] = (
+    await Promise.all(
+      listPublicServers().map(async entry => {
+        return {
+          guild: await interaction.client.guilds.fetch(entry.guildID),
+          showInvite: entry.showInvite,
+          inviteChannelId: entry.inviteChannelId,
+        };
+      })
+    )
+  ).sort((a, b) => b.guild.memberCount - a.guild.memberCount);
 
   const pages = guildList.length;
   if (!pages)
@@ -32,7 +41,16 @@ export async function run(interaction: ChatInputCommandInteraction) {
   let page = (argPage - 1 <= 0 ? 0 : argPage - 1 > pages ? pages - 1 : argPage - 1) || 0;
 
   async function getEmbed() {
-    return await serverEmbed({ guild: guildList[page], page: page + 1, pages });
+    return await serverEmbed({
+      guild: guildList[page].guild,
+      invite: {
+        show: guildList[page].showInvite,
+        channel: guildList[page].inviteChannelId,
+      },
+      page: page + 1,
+      pages,
+      roles: false,
+    });
   }
 
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -48,7 +66,7 @@ export async function run(interaction: ChatInputCommandInteraction) {
 
   const reply = await interaction.reply({
     embeds: [await getEmbed()],
-    components: pages != 1 ? [row] : []
+    components: pages != 1 ? [row] : [],
   });
   if (pages == 1) return;
 

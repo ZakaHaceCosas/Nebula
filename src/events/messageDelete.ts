@@ -16,7 +16,10 @@ export default (async function run(message) {
       name: `•  ${author.displayName}'s message has been deleted.`,
       iconURL: author.displayAvatarURL()
     })
-    .setDescription(`[Jump to message](${message.url})`)
+    .setDescription(
+      `[Jump to message](${message.url}) • [See ${author.displayName}'s profile](https://discord.com/users/${author.id})`
+    )
+    .setTimestamp(new Date())
     .addFields({
       name: "🗑️ • Deleted message",
       value: message.content!

@@ -7,6 +7,7 @@ import {
 } from "discord.js";
 import * as math from "mathjs";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { genColor, genRGBColor } from "../../utils/colorGen";
 
 export const data = new SlashCommandSubcommandBuilder()
   .setName("graph")
@@ -58,7 +59,7 @@ export async function run(interaction: ChatInputCommandInteraction) {
     ctx.stroke();
 
     ctx.strokeStyle = "#ff0000";
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 3;
     ctx.beginPath();
 
     const points = 1000;
@@ -89,16 +90,16 @@ export async function run(interaction: ChatInputCommandInteraction) {
     const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: "graph.png" });
     const embed = new EmbedBuilder()
       .setTitle("Function Graph")
-      .setDescription(`f(x) = ${func}`)
+      .setDescription(`\`f(x) = ${func}\``)
       .setImage("attachment://graph.png")
-      .setColor("#00ff00");
+      .setColor(genColor(100));
 
     await interaction.reply({ embeds: [embed], files: [attachment] });
   } catch (error) {
     return await errorEmbed(
       interaction,
       "Invalid function",
-      "Please provide a valid mathematical function. Examples: 'x^2', 'sin(x)', '2*x + 1'"
+      "Please provide a valid mathematical function. Examples: 'x^2', 'sin(x)', '2*x + 1'."
     );
   }
 }

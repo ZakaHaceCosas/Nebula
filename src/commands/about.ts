@@ -42,7 +42,7 @@ export async function run(interaction: ChatInputCommandInteraction) {
       {
         name: "🔗 • Links",
         value: [
-          "[Discord](https://discord.gg/c6C25P4BuY) • [GitHub](https://www.github.com/SokoraDesu) • [YouTube](https://www.youtube.com/@SokoraDesu) • [Instagram](https://instagram.com/NebulaTheBot) • [Mastodon](https://mastodon.online/@NebulaTheBot@mastodon.social) • [Matrix](https://matrix.to/#/#sokora:matrix.org) • [Revolt](https://rvlt.gg/28TS9aXy)",
+          "[Discord](https://discord.gg/c6C25P4BuY) • [GitHub](https://www.github.com/SokoraDesu) • [YouTube](https://www.youtube.com/@SokoraDesu) • [Mastodon](https://mastodon.online/@NebulaTheBot@mastodon.social) • [Matrix](https://matrix.to/#/#sokora:matrix.org) • [Revolt](https://rvlt.gg/28TS9aXy)",
           "Also, please read the [ToS](https://sokora.org/terms) and the [privacy policy](https://sokora.org/privacy)."
         ].join("\n")
       }

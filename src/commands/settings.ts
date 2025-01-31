@@ -5,17 +5,18 @@ import {
   PermissionsBitField,
   SlashCommandBuilder,
   SlashCommandSubcommandBuilder,
-  type ChatInputCommandInteraction
+  type ChatInputCommandInteraction,
 } from "discord.js";
 import { genColor } from "../utils/colorGen";
 import {
   getSetting,
   setSetting,
   settingsDefinition,
-  settingsKeys
+  settingsKeys,
 } from "../utils/database/settings";
 import { errorEmbed } from "../utils/embeds/errorEmbed";
 import { capitalize } from "../utils/capitalize";
+import { humanizeSettings } from "../utils/humanizeSettings";
 
 export let data = new SlashCommandBuilder()
   .setName("settings")
@@ -94,7 +95,7 @@ export async function run(interaction: ChatInputCommandInteraction) {
   const key = interaction.options.getSubcommand() as keyof typeof settingsDefinition;
   const values = interaction.options.data[0].options!;
   const settingsDef = settingsDefinition[key];
-  const settingText = (name: string) => {
+  const settingText = (name: string): string => {
     const setting = getSetting(guild.id, key, name)?.toString();
     let text;
     switch (settingsDef.settings[name].type) {
@@ -108,7 +109,7 @@ export async function run(interaction: ChatInputCommandInteraction) {
         text = setting ? `<@&${setting}>` : "Not set";
         break;
       default:
-        text = setting || "Not set";
+        text = setting || "*Not set*";
         break;
     }
     return text;
@@ -118,7 +119,14 @@ export async function run(interaction: ChatInputCommandInteraction) {
     const embed = new EmbedBuilder()
       .setAuthor({ name: `${capitalize(key)} settings` })
       .setDescription(
-        Object.keys(settingsDef.settings).map(setting => `${settingsDef.settings[setting].emoji} **• ${capitalize(setting.replaceAll("_", " "))}**: ${settingText(setting)}`).join("\n")
+        Object.keys(settingsDef.settings)
+          .map(
+            setting =>
+              `${settingsDef.settings[setting].emoji} **• ${humanizeSettings(
+                capitalize(setting)
+              )}**: ${humanizeSettings(settingText(setting))}`
+          )
+          .join("\n")
       )
       .setColor(genColor(100));
 
@@ -127,9 +135,9 @@ export async function run(interaction: ChatInputCommandInteraction) {
 
   const embed = new EmbedBuilder()
     .setColor(genColor(100))
-    .setAuthor({ name: `✅ • ${capitalize(key)} settings changed` })
+    .setAuthor({ name: `✅ • ${capitalize(key)} settings changed` });
 
-  let description = ""
+  let description = "";
   for (let i = 0; i < values.length; i++) {
     const option = values[i];
 
@@ -147,9 +155,11 @@ export async function run(interaction: ChatInputCommandInteraction) {
       );
 
     setSetting(guild.id, key, option.name, option.value as string);
-    description += `**${capitalize(option.name)}:** ${settingText(option.name.toString()!)}\n`
+    description += `**${humanizeSettings(capitalize(option.name))}:** ${humanizeSettings(
+      settingText(option.name.toString())
+    )}\n`;
   }
-  embed.setDescription(description)
+  embed.setDescription(description);
 
   await interaction.reply({ embeds: [embed] });
 }
@@ -161,7 +171,7 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
       await interaction.respond(
         ["true", "false"].map(choice => ({
           name: choice,
-          value: choice
+          value: choice,
         }))
       );
       break;
