@@ -49,6 +49,7 @@ export async function run(interaction: ChatInputCommandInteraction) {
       },
       page: page + 1,
       pages,
+      roles: false,
     });
   }
 

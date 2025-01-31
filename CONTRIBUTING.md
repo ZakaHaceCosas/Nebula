@@ -39,7 +39,6 @@ A few, simple guidelines onto how code contributed to Sokora should look like.
 - Use early returns to avoid nesting.
 - Avoid curly braces in one-line `if` statements.
 - Non-nullish assertions are valid when needed.
-- Prefer strict comparisons (`===` / `!==`).
 - Use the cache instead of a new `fetch()` call where possible, to avoid unnecessary usage (e.g., if possible, prefer `guild.members.cache` over `await guild.members.fetch()`).
 
 ![PLEASE SUBMIT A PR, NO DIRECT COMMITS](https://user-images.githubusercontent.com/51555391/176925763-cdfd57ba-ae1e-4bf3-85e9-b3ebd30b1d59.png)

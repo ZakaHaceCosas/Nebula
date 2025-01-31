@@ -15,6 +15,7 @@ type Options = {
     show: boolean;
     channel: string | null;
   };
+  roles?: boolean;
   page?: number;
   pages?: number;
 };
@@ -59,8 +60,8 @@ export async function serverEmbed(options: Options) {
 
   const channelCount = channelSizes.text + channelSizes.voice;
 
-  embed.addFields(
-    {
+  if (options.roles) {
+    embed.addFields({
       name: `🎭 • ${roles.size - 1} ${pluralOrNot("role", roles.size - 1)}`,
       value:
         roles.size == 1
@@ -69,7 +70,10 @@ export async function serverEmbed(options: Options) {
               .slice(0, 5)
               .map(role => `<@&${role[0]}>`)
               .join(", ")}${rolesLength > 5 ? ` and **${rolesLength - 5}** more` : ""}`,
-    },
+    });
+  }
+
+  embed.addFields(
     {
       name: `👥 • ${guild.memberCount?.toLocaleString("en-US")} members`,
       value: [
