@@ -4,6 +4,7 @@ import {
   ButtonInteraction,
   ButtonStyle,
   Guild,
+  GuildManager,
   SlashCommandBuilder,
   type ChatInputCommandInteraction,
 } from "discord.js";
@@ -20,14 +21,23 @@ export async function run(interaction: ChatInputCommandInteraction) {
   const guildList: { guild: Guild; showInvite: boolean; inviteChannelId: string | null }[] = (
     await Promise.all(
       listPublicServers().map(async entry => {
-        return {
-          guild: await interaction.client.guilds.fetch(entry.guildID),
-          showInvite: entry.showInvite,
-          inviteChannelId: entry.inviteChannelId,
-        };
+        try {
+          return {
+            guild: await interaction.client.guilds.fetch(entry.guildID),
+            showInvite: entry.showInvite,
+            inviteChannelId: entry.inviteChannelId,
+          };
+        } catch {
+          // skip entry (we'll get into here most likely because of sokora not being inside of a listable server)
+          // most likely a server kicking sokora without disabling serverboard
+          // TODO - remove the server ID from the list too
+          return null;
+        }
       })
     )
-  ).sort((a, b) => b.guild.memberCount - a.guild.memberCount);
+  )
+    .filter(entry => entry !== null)
+    .sort((a, b) => b.guild.memberCount - a.guild.memberCount);
 
   const pages = guildList.length;
   if (!pages)
