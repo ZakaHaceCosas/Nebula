@@ -17,12 +17,13 @@ export const data = new SlashCommandBuilder()
   .addNumberOption(number => number.setName("page").setDescription("The page you want to see."));
 
 export async function run(interaction: ChatInputCommandInteraction) {
-  const guildList: { guild: Guild; showInvite: boolean }[] = (
+  const guildList: { guild: Guild; showInvite: boolean, inviteChannelId: string | null }[] = (
     await Promise.all(
       listPublicServers().map(async entry => {
         return {
           guild: await interaction.client.guilds.fetch(entry.guildID),
-          showInvite: entry.showInvite
+          showInvite: entry.showInvite,
+          inviteChannelId: entry.inviteChannelId
         };
       })
     )
@@ -42,10 +43,12 @@ export async function run(interaction: ChatInputCommandInteraction) {
   async function getEmbed() {
     return await serverEmbed({
       guild: guildList[page].guild,
-      showInvite: guildList[page].showInvite,
+      invite: {
+        show: guildList[page].showInvite,
+        channel: guildList[page].inviteChannelId
+      },
       page: page + 1,
-      pages,
-      roles: true
+      pages
     });
   }
 

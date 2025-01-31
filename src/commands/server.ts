@@ -6,6 +6,6 @@ export const data = new SlashCommandBuilder()
   .setDescription("Shows this server's info.");
 
 export async function run(interaction: ChatInputCommandInteraction) {
-  const embed = await serverEmbed({ guild: interaction.guild!, roles: true });
+  const embed = await serverEmbed({ guild: interaction.guild! });
   await interaction.reply({ embeds: [embed] });
 }

@@ -4,15 +4,17 @@
  * @returns Embed that contains the guild info.
  */
 
-import { EmbedBuilder, Invite, type Guild } from "discord.js";
+import { ChannelType, EmbedBuilder, Invite, type Guild } from "discord.js";
 import { genColor } from "../colorGen";
 import { imageColor } from "../imageColor";
 import { pluralOrNot } from "../pluralOrNot";
 
 type Options = {
   guild: Guild;
-  showInvite: boolean;
-  roles?: boolean;
+  invite?: {
+    show: boolean;
+    channel: string | null;
+  };
   page?: number;
   pages?: number;
 };
@@ -55,21 +57,19 @@ export async function serverEmbed(options: Options) {
     .setThumbnail(icon)
     .setColor((await imageColor(icon)) ?? genColor(200));
 
-  if (options.roles)
-    embed.addFields({
-      name: `🎭 • ${roles.size - 1} ${pluralOrNot("role", roles.size - 1)}`,
-      value:
-        roles.size == 1
-          ? "*None*"
-          : `${sortedRoles
-              .slice(0, 5)
-              .map(role => `<@&${role[0]}>`)
-              .join(", ")}${rolesLength > 5 ? ` and **${rolesLength - 5}** more` : ""}`
-    });
-
   const channelCount = channelSizes.text + channelSizes.voice;
 
   embed.addFields(
+    {
+      name: `🎭 • ${roles.size - 1} ${pluralOrNot("role", roles.size - 1)}`,
+      value:
+      roles.size == 1
+        ? "*None*"
+        : `${sortedRoles
+            .slice(0, 5)
+            .map(role => `<@&${role[0]}>`)
+            .join(", ")}${rolesLength > 5 ? ` and **${rolesLength - 5}** more` : ""}`
+    },
     {
       name: `👥 • ${guild.memberCount?.toLocaleString("en-US")} members`,
       value: [
@@ -98,7 +98,7 @@ export async function serverEmbed(options: Options) {
     }
   );
 
-  if (options.showInvite) {
+  if (options.invite?.show) {
     const previousInvite: Invite | undefined = (await options.guild.invites.fetch()).find(
       invite =>
         invite.inviter?.id === "873918300726394960" &&
@@ -106,14 +106,24 @@ export async function serverEmbed(options: Options) {
         invite.expiresAt === null
     );
 
-    if (!(options.guild.rulesChannel)) return embed;
-    // TODO - either
-    // 1. show an error to the server owner
-    // 2. use the 1st channel of the server if no rules channel exists)
+    if (!options.guild.rulesChannel) return embed;
+
+    const possiblyFetchedInviteChannel = await options.guild.channels.fetch(
+      options.invite.channel ?? "hi"
+    );
+
+    const inviteChannel =
+      possiblyFetchedInviteChannel &&
+      possiblyFetchedInviteChannel.isTextBased() &&
+      !possiblyFetchedInviteChannel.isThread()
+        ? possiblyFetchedInviteChannel
+        : options.guild.rulesChannel;
+
+    if (!inviteChannel) return embed;
 
     const inviteUrl = previousInvite
       ? previousInvite.url
-      : await options.guild.rulesChannel.createInvite({
+      : await inviteChannel.createInvite({
           maxAge: undefined,
           maxUses: undefined,
           reason: "Serverboard",
