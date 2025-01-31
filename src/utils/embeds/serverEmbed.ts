@@ -38,18 +38,18 @@ export async function serverEmbed(options: Options) {
     text: channels.filter(channel => channel.type == 0 || channel.type == 15 || channel.type == 5)
       .size,
     voice: channels.filter(channel => channel.type == 2 || channel.type == 13).size,
-    categories: channels.filter(channel => channel.type == 4).size
+    categories: channels.filter(channel => channel.type == 4).size,
   };
 
   const generalValues = [
     `Owned by **${(await guild.fetchOwner()).user.displayName}**`,
-    `Created on **<t:${Math.round(guild.createdAt.valueOf() / 1000)}:D>**`
+    `Created on **<t:${Math.round(guild.createdAt.valueOf() / 1000)}:D>**`,
   ];
 
   const embed = new EmbedBuilder()
     .setAuthor({
       name: `${pages ? `#${page}  •  ` : icon ? "•  " : ""}${guild.name}`,
-      iconURL: icon
+      iconURL: icon,
     })
     .setDescription(guild.description ? guild.description : null)
     .setFields({ name: "📃 • General", value: generalValues.join("\n") })
@@ -63,28 +63,28 @@ export async function serverEmbed(options: Options) {
     {
       name: `🎭 • ${roles.size - 1} ${pluralOrNot("role", roles.size - 1)}`,
       value:
-      roles.size == 1
-        ? "*None*"
-        : `${sortedRoles
-            .slice(0, 5)
-            .map(role => `<@&${role[0]}>`)
-            .join(", ")}${rolesLength > 5 ? ` and **${rolesLength - 5}** more` : ""}`
+        roles.size == 1
+          ? "*None*"
+          : `${sortedRoles
+              .slice(0, 5)
+              .map(role => `<@&${role[0]}>`)
+              .join(", ")}${rolesLength > 5 ? ` and **${rolesLength - 5}** more` : ""}`,
     },
     {
       name: `👥 • ${guild.memberCount?.toLocaleString("en-US")} members`,
       value: [
         `**${formattedUserCount}** ${pluralOrNot("user", guild.memberCount - bots.size)}`,
-        `**${bots.size?.toLocaleString("en-US")}** ${pluralOrNot("bot", bots.size)}`
+        `**${bots.size?.toLocaleString("en-US")}** ${pluralOrNot("bot", bots.size)}`,
       ].join("\n"),
-      inline: true
+      inline: true,
     },
     {
       name: `🗨️ • ${channelCount} ${pluralOrNot("channel", channelCount)}`,
       value: [
         `**${channelSizes.text}** text • **${channelSizes.voice}** voice`,
-        `**${channelSizes.categories}** ${pluralOrNot("category", channelSizes.categories)}`
+        `**${channelSizes.categories}** ${pluralOrNot("category", channelSizes.categories)}`,
       ].join("\n"),
-      inline: true
+      inline: true,
     },
     {
       name: `🌟 • ${!boostTier ? "No level" : `Level ${boostTier}`}`,
@@ -92,9 +92,9 @@ export async function serverEmbed(options: Options) {
         `**${boostCount}**${
           !boostTier ? "/2" : boostTier == 1 ? "/7" : boostTier == 2 ? "/14" : ""
         } ${pluralOrNot("boost", boostCount!)}`,
-        `**${boosters.size}** ${pluralOrNot("booster", boosters.size)}`
+        `**${boosters.size}** ${pluralOrNot("booster", boosters.size)}`,
       ].join("\n"),
-      inline: true
+      inline: true,
     }
   );
 
@@ -128,13 +128,13 @@ export async function serverEmbed(options: Options) {
           maxUses: undefined,
           reason: "Serverboard",
           temporary: false,
-          unique: true
+          unique: true,
         });
 
     embed.addFields({
       name: `🚪 • Join in!`,
       value: `This server allows you to join from here. ${inviteUrl}`,
-      inline: true
+      inline: true,
     });
   }
 

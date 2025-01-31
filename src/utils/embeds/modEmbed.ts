@@ -2,7 +2,7 @@ import {
   EmbedBuilder,
   type PermissionResolvable,
   type ChatInputCommandInteraction,
-  type User
+  type User,
 } from "discord.js";
 import ms from "ms";
 import { genColor } from "../colorGen";
@@ -89,7 +89,9 @@ export async function errorCheck(
     return await errorEmbed(
       interaction,
       `You can't ${action.toLowerCase()} ${name}.`,
-      `The member has ${highestModPos == highestTargetPos ? "the same" : "a higher"} role position ${highestModPos == highestTargetPos ? "as" : "than"} you.`
+      `The member has ${
+        highestModPos == highestTargetPos ? "the same" : "a higher"
+      } role position ${highestModPos == highestTargetPos ? "as" : "than"} you.`
     );
 
   if (ownerError) {
@@ -124,7 +126,9 @@ export async function modEmbed(
   const guild = interaction.guild!;
   const name = user.displayName;
   const generalValues = [`**Moderator**: ${interaction.user.displayName}`];
-  let author = `•  ${previousID ? "Edited a " : ""}${previousID ? dbAction?.toLowerCase() : action}${previousID ? " on" : ""} ${name}`;
+  let author = `•  ${previousID ? "Edited a " : ""}${
+    previousID ? dbAction?.toLowerCase() : action
+  }${previousID ? " on" : ""} ${name}`;
   reason ? generalValues.push(`**Reason**: ${reason}`) : generalValues.push("*No reason provided*");
   if (duration) generalValues.push(`**Duration**: ${ms(ms(duration), { long: true })}`);
   if (previousID) {
@@ -181,11 +185,11 @@ export async function modEmbed(
           embed
             .setAuthor({
               name: `•  You got ${action.toLowerCase()}.`,
-              iconURL: user.displayAvatarURL()
+              iconURL: user.displayAvatarURL(),
             })
             .setDescription(generalValues.slice(+!showModerator, generalValues.length).join("\n"))
-            .setColor(genColor(0))
-        ]
+            .setColor(genColor(0)),
+        ],
       })
       .catch(() => null);
   } catch (e) {

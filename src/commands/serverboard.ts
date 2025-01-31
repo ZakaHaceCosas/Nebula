@@ -5,7 +5,7 @@ import {
   ButtonStyle,
   Guild,
   SlashCommandBuilder,
-  type ChatInputCommandInteraction
+  type ChatInputCommandInteraction,
 } from "discord.js";
 import { listPublicServers } from "../utils/database/settings";
 import { errorEmbed } from "../utils/embeds/errorEmbed";
@@ -17,13 +17,13 @@ export const data = new SlashCommandBuilder()
   .addNumberOption(number => number.setName("page").setDescription("The page you want to see."));
 
 export async function run(interaction: ChatInputCommandInteraction) {
-  const guildList: { guild: Guild; showInvite: boolean, inviteChannelId: string | null }[] = (
+  const guildList: { guild: Guild; showInvite: boolean; inviteChannelId: string | null }[] = (
     await Promise.all(
       listPublicServers().map(async entry => {
         return {
           guild: await interaction.client.guilds.fetch(entry.guildID),
           showInvite: entry.showInvite,
-          inviteChannelId: entry.inviteChannelId
+          inviteChannelId: entry.inviteChannelId,
         };
       })
     )
@@ -45,10 +45,10 @@ export async function run(interaction: ChatInputCommandInteraction) {
       guild: guildList[page].guild,
       invite: {
         show: guildList[page].showInvite,
-        channel: guildList[page].inviteChannelId
+        channel: guildList[page].inviteChannelId,
       },
       page: page + 1,
-      pages
+      pages,
     });
   }
 
@@ -65,7 +65,7 @@ export async function run(interaction: ChatInputCommandInteraction) {
 
   const reply = await interaction.reply({
     embeds: [await getEmbed()],
-    components: pages != 1 ? [row] : []
+    components: pages != 1 ? [row] : [],
   });
   if (pages == 1) return;
 
