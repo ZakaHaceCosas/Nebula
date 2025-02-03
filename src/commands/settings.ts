@@ -29,7 +29,7 @@ settingsKeys.forEach(key => {
     .setDescription(settingsDefinition[key].description);
 
   Object.keys(settingsDefinition[key].settings).forEach(sub => {
-    switch (settingsDefinition[key].settings[sub].type as string) {
+    switch (settingsDefinition[key].settings[sub].type) {
       case "BOOL":
         subcommand.addBooleanOption(option =>
           option
