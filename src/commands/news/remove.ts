@@ -1,6 +1,5 @@
 import {
   EmbedBuilder,
-  MessageFlags,
   SlashCommandSubcommandBuilder,
   TextChannel,
   type ChatInputCommandInteraction,
@@ -41,6 +40,6 @@ export async function run(interaction: ChatInputCommandInteraction) {
   deleteNews(guild.id, id);
   await interaction.reply({
     embeds: [new EmbedBuilder().setTitle("News removed.").setColor(genColor(100))],
-    flags: MessageFlags.Ephemeral,
+    flags: "Ephemeral",
   });
 }

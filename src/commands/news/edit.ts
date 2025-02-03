@@ -1,7 +1,6 @@
 import {
   ActionRowBuilder,
   EmbedBuilder,
-  MessageFlags,
   ModalBuilder,
   SlashCommandSubcommandBuilder,
   TextInputBuilder,
@@ -94,7 +93,7 @@ export async function run(interaction: ChatInputCommandInteraction) {
     updateNews(guild.id, id, title, body);
     await i.reply({
       embeds: [new EmbedBuilder().setTitle("News edited.").setColor(genColor(100))],
-      flags: MessageFlags.Ephemeral,
+      flags: "Ephemeral",
     });
   });
 }

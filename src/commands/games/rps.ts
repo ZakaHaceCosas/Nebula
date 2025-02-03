@@ -4,7 +4,6 @@ import {
   ButtonInteraction,
   ButtonStyle,
   EmbedBuilder,
-  MessageFlags,
   SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction,
 } from "discord.js";
@@ -75,7 +74,7 @@ export async function run(interaction: ChatInputCommandInteraction) {
 
     collector.on("collect", async (i: ButtonInteraction) => {
       playerChoices.set(i.user.id, i.customId.split("_")[1] as RPSChoice);
-      await i.reply({ content: "Choice recorded!", flags: MessageFlags.Ephemeral });
+      await i.reply({ content: "Choice recorded!", flags: "Ephemeral" });
       if (playerChoices.size == 2) collector.stop("game-complete");
     });
 
